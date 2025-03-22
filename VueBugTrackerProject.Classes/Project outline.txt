@@ -1,0 +1,34 @@
+﻿As the main purpose of the app is to demonstrate me finding and fixing bugs throughout development,
+I will focus on the minimum steps required to do this
+
+Part 1
+
+Enums
+Backend Models (Account, Project, Bug, Comment, UserPermission, UserIcon) (done)
+Frontend page template (navbar and credits footer) (in progress)
+Controllers (Auth, Account, Project, Bug)
+View models (Account, Project, ProjectPreview, Bug, BugPreview)
+DTOs (User, Project, Bug)
+Pages (Main, Browse (without filter), Registration, Account recovery, password reset, create new project,
+view project, view project bugs, add bug, view bug, credits page, not found)
+Components (Project preview, project form, bug form, registration form, username tag, go back template)
+Page templates (view project, view bug)
+Install the following (Axios, Quasar, Vuelidate, Pinia)
+
+Part 2
+Controllers (comment, user permissions)
+View models (Comment, UserPermissions)
+DTOs (ProjectFilter, Comment, UserPermission)
+Pages (Browse page (with filter), Project settings, bug comments, bug settings, user profile, user settings, user projects, admin list)
+Templates (User page)
+
+Future plans
+show error message when user goes to project they cannot see
+
+Next step: create registration system:
+    - add tooltips to form
+    - add email validation to form
+
+Noted glitches:
+- If the user logs in, logs out and logs in again, the sidebar remains open
+- JWTs only last for 10 minutes before logging the user off

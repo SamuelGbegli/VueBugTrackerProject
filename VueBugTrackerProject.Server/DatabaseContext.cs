@@ -1,0 +1,18 @@
+﻿using Microsoft.EntityFrameworkCore;
+using VueBugTrackerProject.Classes;
+
+namespace VueBugTrackerProject.Server
+{
+    public class DatabaseContext : DbContext
+    {
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Bug> Bugs { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; }
+
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { 
+        }
+
+    }
+}
