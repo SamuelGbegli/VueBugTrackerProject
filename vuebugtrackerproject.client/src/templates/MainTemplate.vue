@@ -11,10 +11,9 @@
           VueBugTracker
         </QToolbarTitle>
         <QSpace/>
-        <div class="q-pa-md">
-          <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="#">Browse</RouterLink>
-
+        <div class="q-pa-md q-gutter-md">
+          <QBtn to="/" label="Home"/>
+        <QBtn to="#" label="Browse"/>
         <!-- section for non logged in users -->
         <QBtn v-if="!authStore.isLoggedIn()" @click="showLoginDialog" label="Login"/>
         <QBtn v-if="!authStore.isLoggedIn()" to="register" label="Register"/>
@@ -39,7 +38,7 @@
   </QAvatar>
           </QItemSection>
           <QItemSection>
-            Username
+            {{ authStore.user.username }}
           </QItemSection>
         </QItem>
         <QItem clickable>
@@ -51,6 +50,17 @@
           </QItemSection>
           <QItemSection>
             Profile
+          </QItemSection>
+        </QItem>
+        <QItem clickable href="/createproject">
+          <QItemSection avatar>
+            <QAvatar size="30px">
+
+              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
+            </QAvatar>
+          </QItemSection>
+          <QItemSection>
+            Create project
           </QItemSection>
         </QItem>
         <QItem clickable>
@@ -99,7 +109,10 @@
       <QBar>
         <QSpace/>
         <!-- links to credits page -->
-        <div><RouterLink to="credits">Credits</RouterLink></div>
+        <div>
+          <RouterLink to="sandbox">Sandbox</RouterLink>
+          <RouterLink to="credits">Credits</RouterLink>
+        </div>
       </QBar>
     </QFooter>
 

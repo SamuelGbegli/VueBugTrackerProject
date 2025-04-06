@@ -3,9 +3,9 @@
   <QDialog ref="dialogRef"
   persistent
    @hide="onDialogHide">
-    <QCard class="q-dialog-plugin bg-grey-5" style="margin: 4px;">
+    <QCard class="q-dialog-plugin" style="margin: 4px;">
       <QCardSection class="row items-center">
-        <h5 style="color: black;">Login</h5>
+        <h5>Login</h5>
         <QSpace />
         <QBtn icon="close" flat v-close-popup />
       </QCardSection>
@@ -33,6 +33,12 @@
           <QBtn type="submit" label="Login" />
         </QCardActions>
       </QForm>
+      <QCardSection>
+        <!--TODO: add link to account recovery page-->
+        <RouterLink to="/recoveraccount">
+          <span @click="onDialogCancel()">Forgot your password?</span>
+        </RouterLink>
+      </QCardSection>
     </QCard>
   </QDialog>
 </template>

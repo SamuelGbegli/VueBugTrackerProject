@@ -15,7 +15,7 @@ export const useAuthStore = defineStore("auth", {
     async login(userDTO: UserDTO){
       try{
         //Sends user DTO to backend server
-        const response = await axios.post("/auth", userDTO);
+        const response = await axios.post("/auth/login", userDTO);
 
         //Stores returned information if login was successful
         if(response.status === 200){
@@ -42,9 +42,10 @@ export const useAuthStore = defineStore("auth", {
 
     //Checks if a user is logged in
     isLoggedIn() {
-      return this.user != null && !!this.user.token;
+      return this.user != null;
     },
 
+    //TODO: possibly remoce
     //Function to verify the user's JWT
     async isJWTValid(){
       if (!this.user.token) return false;
@@ -72,10 +73,31 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    //Checks if the user is logged in with ASP.NET's system
+    async isLoggedInBackend(){
+      try{
+        const response = await axios.get("auth/isloggedin");
+        if(!response.data){
+          this.user = null;
+          localStorage.removeItem("user");
+        }
+        return (response.data);
+      }
+      catch (ex){
+        //If the frontend cannot connect to the server, ensures that the user store is empty
+
+
+        this.user = null;
+        localStorage.removeItem("user");
+        return false;
+      }
+    },
+
     //Function to log the user out
-    logout(){
+    async logout(){
       //Removes user values from stores
       console.log("logging out...");
+      const response = await axios.post("auth/logout", {});
       this.user = null;
       localStorage.removeItem("user");
     }

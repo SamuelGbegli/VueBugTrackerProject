@@ -14,27 +14,31 @@ const pinia = createPinia();
 createApp(App)
 .use(router)
 .use(Quasar,{
+  config:{
+    dark: 'auto'
+  },
   plugins:{
     Dialog, Loading, Notify
   }
 }
 )
 .use(pinia)
-.mount('#app')
+.mount('#app');
 
 //List of routes the user can see only if not logged in
-const nonLoggedInOnlyPages = ["/register"];
+const nonLoggedInOnlyPages = ["/register", "/recoveraccount", "/resetpassword"];
 
-router.beforeEach((to) =>{
+router.beforeEach(async (to) =>{
 
 
-//Checks if the user's JWT is valid every time the page changes
+//Checks if the user is still logged in every time the page changes
   const authStore = useAuthStore();
-  authStore.isJWTValid();
+  authStore.isLoggedInBackend();
 
   //Redirects logged in user to main page if they go to pages
   //only non-logged in users can view
-  if(authStore.isLoggedIn()){
+  if(await authStore.isLoggedInBackend()){
+    console.log("in non logged in section")
     if(nonLoggedInOnlyPages.includes(to.fullPath)){
       router.replace({path:"/"});
     }

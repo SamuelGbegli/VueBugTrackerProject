@@ -6,29 +6,55 @@
   Use the form below to create an account.
 </QBanner>
 <br/>
-<!--TODO: add account form-->
-<QCard style="background-color: teal">
-  <QForm @submit="onSubmit" style="padding: 10px; max-width: 400px;">
-  <QInput label="Email address"
+<QCard>
+  <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+      <QInput label="Email address"
           stack-label
-          type="email"
           v-model="email"
-          :rules="[val => isFieldEmpty(val)]"/>
+          :rules="[val => isFieldEmpty(val), val => isEmailValid(val)]">
+          <template v-slot:append>
+            <QIcon name="help">
+              <QTooltip anchor="center right" self="center left">
+                This will be used to recover your account if you forget your password.
+              </QTooltip>
+            </QIcon>
+          </template>
+          </QInput>
   <QInput label="Username"
           stack-label
          v-model="username"
-          :rules="[val => isFieldEmpty(val), val => isUsernameValid(val)]"/>
+          :rules="[val => isFieldEmpty(val), val => isUsernameValid(val)]">
+          <template v-slot:append>
+            <QIcon name="help">
+              <QTooltip anchor="center right" self="center left">
+                Usernames must be at least 4 characters long and not be used by another user.
+              </QTooltip>
+            </QIcon>
+          </template>
+          </QInput>
   <QInput label="Password"
           stack-label
           type="password"
           v-model="password"
-          :rules="[val => isFieldEmpty(val), val => isPasswordValid(val)]"/>
+          :rules="[val => isFieldEmpty(val), val => isPasswordValid(val)]">
+            <template v-slot:append>
+              <QIcon name="help">
+              <QTooltip anchor="center right" self="center left">
+                Passwords must be at least 8 characters long and have at least one:
+                <ul>
+                  <li>upper case letter</li>
+                  <li>lower case letter</li>
+                  <li>digit</li>
+                </ul>
+              </QTooltip>
+            </QIcon>
+            </template>
+            </QInput>
   <QInput label="Confirm password"
           stack-label
           type="password"
           v-model="passwordConfirm"
           :rules="[val => isFieldEmpty(val), val => isPasswordConfirmValid()]"/>
-
     <div>
     <QSpace/>
       <QBtn type="submit" label="Create account"/>
@@ -43,7 +69,7 @@ import UserDTO from '@/classes/DTOs/UserDTO';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/AuthStore';
 import router from '@/router/router';
-import { Loading, Notify } from 'quasar';
+import { Loading, Notify, QIcon, QSpace, QTooltip } from 'quasar';
 
 const email = ref("");
 const username = ref("");
@@ -63,7 +89,11 @@ function isFieldEmpty(input: string){
 
 //Checks if an email is valid
 function isEmailValid(input: string){
-  //TODO: add function to validate email
+
+  if(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(input))
+  return true;
+
+  return "Email is invalid.";
 }
 
 //Checks if a username is valid
@@ -113,7 +143,6 @@ Loading.show({
   message: "Please wait..."
 });
 
-//TODO: add method to sumbit data
 
 let userDTO = new UserDTO();
 userDTO.Emailaddress = email.value;
@@ -136,7 +165,7 @@ console.log(response);
     //Shows error message if account is created and the server fails to log in
     else{
       Notify.create({
-    message: "Something went wrong when logging in. You account has been created, so please try again later",
+    message: "Something went wrong when logging in. Youe account has been created, so please log in with your credentials later.",
     position: "bottom",
     type: "negative"
   });

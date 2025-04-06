@@ -60,6 +60,12 @@ namespace VueBugTrackerProject.Classes
         [Required]
         [Column(TypeName = "datetime2")]
         public DateTime DateModified { get; set; }
-	
-	}
+
+        /// <summary>
+        /// Determines whether the bug is open or closed
+        /// </summary>
+        [Required]
+        public Status Status { get; set; }
+
+    }
 }

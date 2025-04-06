@@ -86,11 +86,33 @@ namespace VueBugTrackerProject.Server
         public ClaimsIdentity GetClaims(Account account)
         {
             var claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim("name", account.Username));
+            claims.AddClaim(new Claim("name", account.UserName));
             claims.AddClaim(new Claim("email", account.Email));
             claims.AddClaim(new Claim("role", account.Role.ToString()));
 
             return claims;
+        }
+
+        /// <summary>
+        /// Converts a token to base 64 characters.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string ConvertToBase64(string input)
+        {
+            var bytes = Encoding.UTF8.GetBytes(input);
+            return Convert.ToBase64String(bytes);
+        }
+
+        /// <summary>
+        /// Converts an encoded base 64 token to its original format.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string ConvertFromBase64(string input)
+        {
+            var bytes = Convert.FromBase64String(input);
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }

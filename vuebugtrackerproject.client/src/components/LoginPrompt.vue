@@ -1,14 +1,11 @@
+<!--Asks the user to log in on protected resources-->
 <template>
-  <h2>Main Page</h2>
-  <br/>
   <div>
-  <!--Welcome banner. Hidden if user is logged in-->
-    <QBanner class="bg-purple-8" v-if="!authStore.isLoggedIn()">
-      <h4>Welcome to VueBugTracker</h4>
-      <p>Register or log in to access more features.</p>
+    <QBanner class="bg-red-8">
+      <p>{{ message? message :"You must be logged in to view this resource." }}</p>
       <template v-slot:action>
         <QBtn @click="showLoginDialog" label="Login"/>
-        <QBtn to="register" label="Register"/>
+        <QBtn @click="router.back" label="Go back"/>
       </template>
     </QBanner>
   </div>
@@ -18,7 +15,14 @@
 import { Dialog } from 'quasar';
 import LoginDialog from '@/dialogs/LoginDialog.vue';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useRouter } from 'vue-router';
 import router from '@/router/router';
+
+const props = defineProps({
+  message: String
+})
+
+const route = useRouter();
 
 const authStore = useAuthStore();
 

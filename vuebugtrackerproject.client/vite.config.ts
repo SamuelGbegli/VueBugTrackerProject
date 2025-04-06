@@ -62,6 +62,9 @@ export default defineConfig({
       }, '^/accounts': {
         target,
         secure: false
+      },'^/projects': {
+        target,
+        secure: false
       },
 
     },
