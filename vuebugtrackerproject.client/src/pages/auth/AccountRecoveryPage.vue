@@ -1,11 +1,6 @@
 <!--Page for a user to help regain access to their account
 if they forget their password-->
 
-<!--TODO:
-Add form for user to enter a username and email
-Add form validation
-Add notifications when a password reset token is successfully sent
--->
 <template>
   <h4>Account recovery</h4>
 <br/>

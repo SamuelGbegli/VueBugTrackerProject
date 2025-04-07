@@ -19,16 +19,26 @@ namespace VueBugTrackerProject.Classes
 		/// The short description of the project.
 		/// </summary>
 		public string Summary { get; set; }
-	
-		/// <summary>
-		/// The user that created the project.
-		/// </summary>
-		public AccountViewModel Owner { get; set; }
-	
-		/// <summary>
-		/// The number of bugs in the project are open.
-		/// </summary>
-		public int OpenBugs { get; set; }
+
+        /// <summary>
+        /// The ID of the user that created the project.
+        /// </summary>
+        public string OwnerID { get; set; }
+
+        /// <summary>
+        /// The name of the user that created the project.
+        /// </summary>
+        public string OwnerName { get; set; }
+
+        /// <summary>
+        /// The icon of the user that created the project.
+        /// </summary>
+        public string OwnerIcon { get; set; }
+
+        /// <summary>
+        /// The number of bugs in the project are open.
+        /// </summary>
+        public int OpenBugs { get; set; }
 	
 		/// <summary>
 		/// The total number of bugs in the project.
@@ -49,7 +59,9 @@ namespace VueBugTrackerProject.Classes
             ID = project.ID;
 			Name = project.Name;
 			Summary = project.Summary;
-			Owner = new AccountViewModel(project.Owner);
+			OwnerID = project.Owner.Id;
+			OwnerName = project.Owner.UserName;
+			OwnerIcon = project.Owner.Icon;
 			OpenBugs = project.Bugs.Count(b => b.Status == Status.Open);
 			TotalBugs = project.Bugs.Count();
 			DateModified = project.DateModified;

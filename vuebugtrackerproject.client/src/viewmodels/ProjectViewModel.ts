@@ -5,21 +5,29 @@ import AccountViewModel from "./AccountViewModel";
 export default class ProjectViewModel{
 
 	// Unique identifier for the project.
-	ID: string = "";
+	id: string = "";
 	// The name of the project.
-	Name: string = "";
+	name: string = "";
 	// The short description of the project.
-	Summary: string = "";
-	// The user that created the project.
-	Owner: AccountViewModel ;
+	summary: string = "";
+	// The project's external link.
+	link: string = "";
+	// The ID of the user that created the project.
+	ownerID: string =  "";
+	// The name of the user that created the project.
+	ownerName: string =  "";
+	// The icon of the user that created the project.
+	ownerIcon: string =  "";
 	// The number of bugs in the project are open.
-	OpenBugs: number = 0;
+	openBugs: number = 0;
 	// The total number of bugs in the project.
-	TotalBugs: number  = 0;
+	totalBugs: number  = 0;
+	// The date the project was created.
+	dateCreated: Date;
 	// The date the project was last updated.
-	DateModified: Date;
+	dateModified: Date;
 	// The formatted project description.
-	Description: string = "";
+	description: string = "";
 	// The project's tags.
-	Tags: string[] = [];
+	tags: string[] = [];
 }

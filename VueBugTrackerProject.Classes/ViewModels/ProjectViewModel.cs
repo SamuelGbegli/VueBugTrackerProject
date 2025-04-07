@@ -19,36 +19,73 @@ namespace VueBugTrackerProject.Classes
 		/// The short description of the project.
 		/// </summary>
 		public string Summary { get; set; }
-	
+
 		/// <summary>
-		/// The user that created the project.
+		/// The project's external link.
 		/// </summary>
-		public AccountViewModel Owner { get; set; }
-	
-		/// <summary>
-		/// The number of bugs in the project are open.
-		/// </summary>
-		public int OpenBugs { get; set; }
+        public string Link { get; set; }
+
+        /// <summary>
+        /// The ID of the user that created the project.
+        /// </summary>
+        public string OwnerID { get; set; }
+
+        /// <summary>
+        /// The name of the user that created the project.
+        /// </summary>
+        public string OwnerName { get; set; }
+
+        /// <summary>
+        /// The icon of the user that created the project.
+        /// </summary>
+        public string OwnerIcon { get; set; }
+
+        /// <summary>
+        /// The number of bugs in the project are open.
+        /// </summary>
+        public int OpenBugs { get; set; }
 	
 		/// <summary>
 		/// The total number of bugs in the project.
 		/// </summary>
 		public int TotalBugs { get; set; }
-	
-		/// <summary>
-		/// The date the project was last updated.
-		/// </summary>
-		public DateTime DateModified { get; set; }
-	
-		/// <summary>
-		/// The formatted project description.
-		/// </summary>
-		public string Description { get; set; }
+
+        /// <summary>
+        /// The date the project was created.
+        /// </summary>
+        public DateTime DateCreated { get; set; }
+
+        /// <summary>
+        /// The date the project was last updated.
+        /// </summary>
+        public DateTime DateModified { get; set; }
+
+        /// <summary>
+        /// The formatted project description.
+        /// </summary>
+        public string Description { get; set; }
 	
 		/// <summary>
 		/// The project's tags.
 		/// </summary>
 		public List<string> Tags { get; set; }
-	
-	}
+
+
+        public ProjectViewModel(Project project)
+        {
+            ID = project.ID;
+			Name = project.Name;
+			Summary = project.Summary;
+			Link = project.Link;
+			OwnerID = project.Owner.Id;
+			OwnerName = project.Owner.UserName;
+			OwnerIcon = project.Owner.Icon;
+			OpenBugs = project.Bugs.Count(b => b.Status == Status.Open);
+			TotalBugs = project.Bugs.Count;
+			DateCreated = project.DateCreated;
+			DateModified = project.DateModified;
+			Description = project.FormattedDescription;
+			Tags = project.Tags;
+        }
+    }
 }

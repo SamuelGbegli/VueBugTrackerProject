@@ -13,7 +13,7 @@ Pages (Main, Browse (without filter), Registration, Account recovery, password r
 view project, view project bugs, add bug, view bug, credits page, not found)
 Components (Project preview, project form, bug form, registration form, username tag, go back template)
 Page templates (view project, view bug)
-Install the following (Axios, Quasar, Vuelidate, Pinia)
+Install the following (Axios, Quasar, Vuelidate, Pinia) 
 
 Part 2
 Controllers (comment, user permissions)
@@ -25,8 +25,12 @@ Templates (User page)
 Future plans
 show error message when user goes to project they cannot see
 
-Next step: Project view template
-  - Get project from backend
+Next steps: Project view
+  show the following messages for unauthorised views
+  - if project is for logged in users only, and the user isn't logged in, show prompt for user to log in
+  - if project is restricted and the user isn't logged in, show prompt saying user needs to log in to see if they can access the project
+  - if project is restricted and the user is logged in, show message saying they cannot view the project
+  - if project fails to load, show error message
 
 
 Noted glitches:
@@ -39,4 +43,5 @@ Noted glitches:
 - Users are not redirected when logging while on a page only non-logged in users are supposed to see
 - Log in prompt is briefly visible when accessing a restricted page
 - User icon is not aligned with buttons in navbar
-- Page elements do not refresh whel logging out
+- Page elements do not refresh when logging out
+- Possibly show unique error messages when viewing a project that does not exist

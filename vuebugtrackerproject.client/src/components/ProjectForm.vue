@@ -75,7 +75,6 @@ import { useRouter } from 'vue-router';
 
 // Submits form to server
   async function onSubmit() {
-    //TODO: send project DTO to backend
 
     Loading.show({
       message: "Please wait..."

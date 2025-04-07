@@ -45,12 +45,11 @@ export const useAuthStore = defineStore("auth", {
       return this.user != null;
     },
 
-    //TODO: possibly remoce
+    //TODO: possibly remove
     //Function to verify the user's JWT
     async isJWTValid(){
       if (!this.user.token) return false;
 
-      //TODO: add method to connect to backend and verify token
       try{
         //Sends token to backend to validate
         const response = await axios.post("/auth/validatetoken", JSON.parse(localStorage.getItem("user") || "{}").token,{

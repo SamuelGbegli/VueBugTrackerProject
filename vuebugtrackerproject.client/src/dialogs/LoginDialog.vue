@@ -34,7 +34,6 @@
         </QCardActions>
       </QForm>
       <QCardSection>
-        <!--TODO: add link to account recovery page-->
         <RouterLink to="/recoveraccount">
           <span @click="onDialogCancel()">Forgot your password?</span>
         </RouterLink>

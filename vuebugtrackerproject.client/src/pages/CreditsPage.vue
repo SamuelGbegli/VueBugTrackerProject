@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO: add links to components used in the projecy -->
+  <!-- TODO: add links to components used in the project -->
   <p>The following tools and technologies were used to make this project:</p>
   <ul>
     <li><b>Vue</b> to provide the application's framework (<a href="https://vuejs.org/">vuejs.org</a>)</li>
