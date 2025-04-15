@@ -110,8 +110,8 @@
         <QSpace/>
         <!-- links to credits page -->
         <div>
-          <RouterLink to="sandbox">Sandbox</RouterLink>
-          <RouterLink to="credits">Credits</RouterLink>
+          <RouterLink to="/sandbox">Sandbox</RouterLink>
+          <RouterLink to="/credits">Credits</RouterLink>
         </div>
       </QBar>
     </QFooter>

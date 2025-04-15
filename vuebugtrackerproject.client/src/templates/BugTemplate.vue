@@ -1,15 +1,22 @@
 <template>
   <div v-if="statusCode === 200">
     <QBanner>
-      <h3>{{ project.name }}</h3>
-      <h6>{{ project.summary }}</h6>
-      <h6>Last updated: {{ formatDate(project.dateModified )}}</h6>
+    <div class="row">
+      <div class="col">
+        <h3>{{ bug.projectName }}/Bugs</h3>
+      </div>
+      <div class="col-2">
+          <QBtn label="Back to main" :to="`/project/${bug.projectID}`"/>
+      </div>
+    </div>
+      <h6>{{ bug.summary }}</h6>
+      <h6>Last updated: {{ formatDate(bug.dateModified) }}</h6>
     </QBanner>
     <QTabs align="left">
-      <QRouteTab label="Main" :to="`/project/${project.id}`"/>
-      <QRouteTab label="Bugs" :to="`/project/${project.id}/bugs`"/>
-      <!--hidden if user does not own project-->
-      <QRouteTab v-if="!!authStore.user && authStore.user.id === project.ownerID" label="Settings" :to="`#`"/>
+      <QRouteTab label="Main" :to="`/bug/${bug.id}`"/>
+      <QRouteTab label="Discussion" :to="`/bug/${bug.id}/discussion`"/>
+      <!--hidden if user does not own project or created bug-->
+      <QRouteTab v-if="authStore.getUserID() === bug.creatorID || authStore.getUserID() === bug.projectOwnerID " label="Settings" :to="`/bug/${bug.id}/settings`"/>
     </QTabs>
     <router-view />
   </div>
@@ -25,11 +32,14 @@ import { useAuthStore } from '@/stores/AuthStore';
 import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
+import BugViewModel from '@/viewmodels/BugViewModel';
 import formatDate from '@/classes/helpers/FormatDate';
 
 const authStore = useAuthStore();
 
-const project = ref(new ProjectViewModel());
+const bug = ref(new BugViewModel());
+
+
 const statusCode = ref();
 const errorMessage = ref("");
 const errorPromptType = ref();
@@ -41,9 +51,9 @@ onMounted(async ()=>{
   //TODO: add error handling if project cannot be fetched from database
   try{
   //Loads project from database
-    const response = await axios.get(`/projects/get/${route.params.projectId}`);
+    const response = await axios.get(`/bugs/get/${route.params.bugId}`);
     //Converts JSON to Project view model
-    project.value = Object.assign(new ProjectViewModel(), response.data);
+    bug.value = Object.assign(new BugViewModel(), response.data);
     //Updates status code to show the project
     statusCode.value = response.status;
     console.log(response.status);

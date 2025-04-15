@@ -65,6 +65,12 @@ export default defineConfig({
       },'^/projects': {
         target,
         secure: false
+      },'^/bugs': {
+        target,
+        secure: false
+      },'^/comments': {
+        target,
+        secure: false
       },
 
     },

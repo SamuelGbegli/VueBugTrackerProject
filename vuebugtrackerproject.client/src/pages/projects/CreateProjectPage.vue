@@ -8,14 +8,15 @@
     <ProjectForm/>
   </div>
   <div v-else>
-    <LoginPrompt/>
+    <ErrorBanner :promptType="ErrorPromptType.LoginAndGoBackButtons"/>
   </div>
 </template>
 <script setup lang="ts">
   import { useAuthStore } from '@/stores/AuthStore';
-  import LoginPrompt from '@/components/LoginPrompt.vue';
+  import ErrorBanner from '@/components/ErrorBanner.vue';
 import { onMounted, ref } from 'vue';
 import ProjectForm from '@/components/ProjectForm.vue';
+import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 
 const authStore = useAuthStore();
 const isLoggedIn = ref();

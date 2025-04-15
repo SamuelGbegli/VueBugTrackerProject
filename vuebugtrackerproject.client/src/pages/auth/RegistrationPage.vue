@@ -165,7 +165,7 @@ console.log(response);
     //Shows error message if account is created and the server fails to log in
     else{
       Notify.create({
-    message: "Something went wrong when logging in. Youe account has been created, so please log in with your credentials later.",
+    message: "Something went wrong when logging in. Your account has been created, so please log in with your credentials later.",
     position: "bottom",
     type: "negative"
   });

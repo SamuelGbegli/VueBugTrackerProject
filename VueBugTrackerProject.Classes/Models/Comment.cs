@@ -57,6 +57,10 @@ namespace VueBugTrackerProject.Classes
 		/// deleted.
 		/// </summary>
 		public bool IsCommentReplyDeleted { get; set; }
-	
-	}
+
+		/// <summary>
+		/// The bug the comment belongs to.
+		/// </summary>
+        public Bug Bug { get; set; }
+    }
 }

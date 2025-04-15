@@ -1,11 +1,17 @@
 import AccountRecoveryPage from "@/pages/auth/AccountRecoveryPage.vue";
 import PasswordResetPage from "@/pages/auth/PasswordResetPage.vue";
 import RegistrationPage from "@/pages/auth/RegistrationPage.vue";
+import BugDiscussionPage from "@/pages/bugs/BugDiscussionPage.vue";
+import BugSettingsPage from "@/pages/bugs/BugSettingsPage.vue";
+import ViewBugPage from "@/pages/bugs/ViewBugPage.vue";
 import CreditsPage from "@/pages/CreditsPage.vue";
 import MainPage from "@/pages/MainPage.vue";
 import Sandbox from "@/pages/other/sandbox.vue";
+import AddBugPage from "@/pages/projects/AddBugPage.vue";
 import CreateProjectPage from "@/pages/projects/CreateProjectPage.vue";
+import ProjectBugsPage from "@/pages/projects/ProjectBugsPage.vue";
 import ViewProjectPage from "@/pages/projects/ViewProjectPage.vue";
+import BugTemplate from "@/templates/BugTemplate.vue";
 import MainTemplate from "@/templates/MainTemplate.vue";
 import ProjectTemplate from "@/templates/ProjectTemplate.vue";
 
@@ -53,6 +59,32 @@ const router = createRouter({
           {
             path: ":projectId",
             component: ViewProjectPage
+          },
+          {
+            path: ":projectId/bugs",
+            component: ProjectBugsPage
+          },
+          {
+            path: ":projectId/bugs/add",
+            component: AddBugPage
+          }
+        ]
+      },
+      {
+        path: "bug",
+        component:BugTemplate,
+        children:[
+          {
+            path: ":bugId",
+            component: ViewBugPage
+          },
+          {
+            path: ":bugId/settings",
+            component: BugSettingsPage
+          },
+          {
+            path: ":bugId/discussion",
+            component: BugDiscussionPage
           }
         ]
       }

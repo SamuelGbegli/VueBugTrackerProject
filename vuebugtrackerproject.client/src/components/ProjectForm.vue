@@ -2,8 +2,9 @@
 <!--TODO: add edit mode for existing projects-->
 <template>
   <QCard style=" max-width: 1200px;">
-    <QForm @submit="onSubmit" style="margin: 5px">
-      <div class="q-pa-md example-row-equal-width">
+    <QForm @submit="onSubmit">
+      <QCardSection>
+        <div class="q-pa-md example-row-equal-width">
         <div class="row q-gutter-lg">
           <div class="col" style="max-width: 400px;">
             <QInput label="Project name"
@@ -45,6 +46,7 @@
       </div>
 
     </div>
+      </QCardSection>
     <QCardActions>
       <QBtn type="submit" label="Submit"/>
     </QCardActions>

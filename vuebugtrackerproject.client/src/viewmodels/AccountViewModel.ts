@@ -13,5 +13,5 @@ export default class AccountViewModel{
 	// If true, the user cannot login with the account.
 	Suspended: boolean = false;
 	// The date and time the account was created.
-	DateCreated: DateTime;
+	DateCreated: Date = new Date();
 }

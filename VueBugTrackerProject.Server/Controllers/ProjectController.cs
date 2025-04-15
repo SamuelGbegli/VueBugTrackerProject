@@ -195,14 +195,17 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (project.Visibility == Visibility.Restricted)
                 {
                     var currentUser = await _userManager.GetUserAsync(User);
-                    if (project.Owner != currentUser || !project.UserPermissions.Any(up => up.Account == currentUser))
-                        return Forbid("Permission denied");
+                    if (currentUser == null) return Unauthorized("Restricted project");
+
+                    //Bounces user if they do not own the project or have permission to view it
+                    if (project.Owner != currentUser && !project.UserPermissions.Any(up => up.Account == currentUser))
+                        return Forbid();
                 }
 
                 //For projects only visible to logged in users, checks if user is logged in
                 if (project.Visibility == Visibility.LoggedInOnly)
                 {
-                    if (!User.Identity.IsAuthenticated) return Forbid("Permission denied");
+                    if (!User.Identity.IsAuthenticated) return Unauthorized("Login reqired");
                 }
 
                 //Returns project view model
@@ -234,16 +237,67 @@ namespace VueBugTrackerProject.Server.Controllers
                 var projectToDelete = await _dbContext.Projects.FindAsync(projectID);
 
                 //Bounces if project does not exist with ID given
-                if (projectToDelete == null) return Forbid("Invalid delete operation");
+                if (projectToDelete == null) return NotFound("Project does not exist");
 
                 //Bounces if user does not own project
-                if (projectToDelete.Owner != currentUser) return Forbid("Invalid delete operation");
+                if (projectToDelete.Owner != currentUser) return Forbid();
 
                 //Removes project from database
                 _dbContext.Projects.Remove(projectToDelete);
                 await _dbContext.SaveChangesAsync();
 
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Function to create dummy projects for testing.  
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("createtestprojects")]
+        [Authorize]
+        public async Task<IActionResult> CreateTestProjects()
+        {
+            try
+            {
+                var account = await _userManager.GetUserAsync(User);
+                for (int i = 1; i <= 4; i++)
+                {
+                    //Creates new project
+                    var project = new Project
+                    {
+                        Name = $"Test project {i}",
+                          Summary = $"Test project {i}",
+                        Visibility = Visibility.Public,
+                        DateCreated = DateTime.UtcNow,
+                        DateModified = DateTime.UtcNow,
+                        Owner = account
+                    };
+
+                    for (int j = 1; j <= 25 * i; j++)
+                    {
+                        //Adds dummy bug to project for testing
+                        project.Bugs.Add(new Bug
+                        {
+                            Summary = $"Test bug {j}",
+                            Severity = Severity.Low,
+                            Status = Status.Open,
+                            Description = $"This is dummy bug {j} for test job {i}",
+                            Creator = account,
+                            DateCreated = DateTime.UtcNow,
+                            DateModified = DateTime.UtcNow,
+                        });
+                    }
+                    await _dbContext.Projects.AddAsync(project);
+                }
+
+                await _dbContext.SaveChangesAsync();
+                return Created();
             }
             catch (Exception ex)
             {

@@ -2,19 +2,23 @@
 <div class="q-pa-md row q-gutter-md">
   <div class="col-8">
     <QCard style="min-height: 60vh">
-      <QCardSection>
+      <QCardSection v-if="statusCode === 200">
         <h5>Description</h5>
         <div v-html="(project.description != '' ? project.description : 'No description provided')"/>
+      </QCardSection>
+      <QCardSection v-else>
+        <QSkeleton square height="500px"/>
       </QCardSection>
     </QCard>
   </div>
   <div class="col">
-    <QCard style="min-height: 60vh;">
-      <QCardSection>
+    <QCard>
+      <div v-if="statusCode === 200">
+        <QCardSection>
         <h5>Project details</h5>
       </QCardSection>
       <QCardSection>
-        <h6>Created on {{ project.dateCreated }}</h6>
+        <h6>Created on {{ formatDate(project.dateCreated) }}</h6>
       </QCardSection>
       <QCardSection>
         <h6>Owner</h6>
@@ -22,7 +26,7 @@
       </QCardSection>
       <QCardSection>
         <h6>Project link</h6>
-        <a v-if="project.link != ''" :href="project.link"/>
+        <a v-if="project.link != ''" :href="project.link">{{ project.link }}</a>
         <span v-else>None provided</span>
       </QCardSection>
       <QCardSection>
@@ -32,11 +36,18 @@
       <QCardSection>
         <h6>Tags</h6>
         <div>
-          <QChip color="blue" v-for="x in project.tags">
+          <QChip color="blue" v-if="project.tags.length > 0" v-for="x in project.tags">
             {{ x }}
           </QChip>
+          <span v-else>No tags provided</span>
         </div>
       </QCardSection>
+      </div>
+      <div v-else>
+        <QCardSection>
+          <QSkeleton square height="500px"/>
+        </QCardSection>
+      </div>
     </QCard>
   </div>
 </div>
@@ -49,6 +60,8 @@ import { useRoute } from 'vue-router';
 import router from '@/router/router';
 import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import UserIcon from '@/components/UserIcon.vue';
+import { format } from 'quasar';
+import formatDate from '@/classes/helpers/FormatDate';
 
   const project = ref(new ProjectViewModel());
   const statusCode = ref();

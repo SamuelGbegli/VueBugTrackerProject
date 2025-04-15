@@ -4,6 +4,9 @@ import type UserDTO from "@/classes/DTOs/UserDTO";
 
 import axios, { AxiosError } from "axios";
 import { defineStore } from "pinia";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 export const useAuthStore = defineStore("auth", {
   //User value is user item fetched from localStorage
@@ -94,11 +97,20 @@ export const useAuthStore = defineStore("auth", {
 
     //Function to log the user out
     async logout(){
+
       //Removes user values from stores
       console.log("logging out...");
-      const response = await axios.post("auth/logout", {});
+      const response = await axios.post("/auth/logout", {});
       this.user = null;
       localStorage.removeItem("user");
+
+      //Reloads page when logged in
+      router.go(0);
+    },
+    //Gets the id of the user logged in
+    getUserID(){
+      if(!!this.user) return this.user.id;
+      return "";
     }
   }
 })

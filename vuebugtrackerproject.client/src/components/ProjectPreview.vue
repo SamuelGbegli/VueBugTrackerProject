@@ -8,7 +8,7 @@
       :username="Project?.ownerName"
       :icon="Project?.ownerIcon"/>
      <div class="text-subtitle2">Open bugs: {{ Project?.openBugs }}/{{ Project?.totalBugs }}</div>
-      <div class="text-subtitle2">Last updated: {{ Project?.dateModified }}</div>
+      <div class="text-subtitle2">Last updated: {{ formatDate(Project.dateModified) }}</div>
     </QCardSection>
     <QCardActions align="right">
       <QBtn :to="`project/${Project?.id}`" label="View"/>
@@ -20,6 +20,7 @@
 import ProjectPreviewViewModel from '@/viewmodels/ProjectPreviewViewModel';
 import { onMounted, ref } from 'vue';
 import UserIcon from './UserIcon.vue';
+import formatDate from '@/classes/helpers/FormatDate';
 
 const props = defineProps({
   Project: ProjectPreviewViewModel

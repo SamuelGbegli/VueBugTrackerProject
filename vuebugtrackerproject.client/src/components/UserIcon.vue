@@ -1,6 +1,5 @@
 <template>
   <QAvatar size="30px" style="margin: 5px;">
-    <!-- TODO: add avatar icon -->
     <img :src="props.icon ? props.icon : 'https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg'"/>
   </QAvatar>
   <span>{{ username ? username : "Null username" }}</span>

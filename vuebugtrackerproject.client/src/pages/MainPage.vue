@@ -133,7 +133,7 @@ async function getRecentUserProjects(){
   }
   catch (ex){
     let error = ex as AxiosError;
-    projectsStatusCode.value = error.status;
+    userProjectsStatusCode.value = error.status;
     console.log(error);
   }
 }

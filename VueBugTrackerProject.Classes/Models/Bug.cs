@@ -45,7 +45,7 @@ namespace VueBugTrackerProject.Classes
         /// A list of the bug’s comments and status updates.
         /// </summary>
         [Required]
-        public List<Comment> Comments { get; set; }
+        public List<Comment> Comments { get; set; } = new List<Comment>();
 
         /// <summary>
         /// The date the bug was created.
@@ -66,6 +66,12 @@ namespace VueBugTrackerProject.Classes
         /// </summary>
         [Required]
         public Status Status { get; set; }
+
+        /// <summary>
+        /// The project the bug belongs to.
+        /// </summary>
+        [Required]
+        public Project Project { get; set; }
 
     }
 }

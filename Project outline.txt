@@ -25,13 +25,37 @@ Templates (User page)
 Future plans
 show error message when user goes to project they cannot see
 
-Next steps: Project view
-  show the following messages for unauthorised views
-  - if project is for logged in users only, and the user isn't logged in, show prompt for user to log in
-  - if project is restricted and the user isn't logged in, show prompt saying user needs to log in to see if they can access the project
-  - if project is restricted and the user is logged in, show message saying they cannot view the project
-  - if project fails to load, show error message
+Project Requirements:
+  Landing page (done, except for links to browse page and user projects pags)
+  Browse page (not done)
+    A grid of projects and pagination (not done)
+    Sorting and filtering (not done)
+  Logging in, Registration and account recovery (all done)
+  navbar (mostly done)
+  Creating new projects (done)
+  Viewing projects (done)
+  Deleting projects (not done)
+  Viewing project bugs (done)
+  Adding bugs (done)
+  Editing bugs (in progress)
+  Viewing bugs (done)
+  Deleting bugs (done)
+  Project settings (not done)
+  Admin only user list page (not done)
+  Bug commenting and logging (in progress)
+  User profile (not done)
+  User projects (not done)
+  User settings (not done)
+  404 page (partially implemented)
 
+
+Next steps:
+  - Closing and reopening bugs (done on bug view page)
+  - Viewing comments and status updates
+  - Bug settings (in progress)
+  - project settings
+  - browsing projects
+  - Convert comment form to dialog box
 
 Noted glitches:
 - If the user logs in, logs out and logs in again, the sidebar remains open
@@ -40,8 +64,9 @@ Noted glitches:
 - Form fields show error messages when user types in them for the first time
 - User is logged out when moving to another page and the Backend is disabled
 - Password reset error is briefly visible when valid ID and token is supplied
-- Users are not redirected when logging while on a page only non-logged in users are supposed to see
+- Users are not redirected when logging in while on a page only non-logged in users are supposed to see
 - Log in prompt is briefly visible when accessing a restricted page
 - User icon is not aligned with buttons in navbar
 - Page elements do not refresh when logging out
-- Possibly show unique error messages when viewing a project that does not exist
+- No loading control in bug overview page
+- Project overview does not show number of bugs

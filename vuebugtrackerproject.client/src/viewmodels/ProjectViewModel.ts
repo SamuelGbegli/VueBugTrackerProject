@@ -23,9 +23,9 @@ export default class ProjectViewModel{
 	// The total number of bugs in the project.
 	totalBugs: number  = 0;
 	// The date the project was created.
-	dateCreated: Date;
+	dateCreated: Date = new Date();
 	// The date the project was last updated.
-	dateModified: Date;
+	dateModified: Date = new Date();
 	// The formatted project description.
 	description: string = "";
 	// The project's tags.
