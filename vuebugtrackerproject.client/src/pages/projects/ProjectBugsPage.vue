@@ -1,15 +1,13 @@
 <template>
   <div class="q-pa-md">
   <div class="row">
-    <div class="col">
       <h6>Number of bugs: {{ totalBugs }}</h6>
-    </div>
-    <div class="col-2">
+      <QSpace/>
       <QBtn :to="`/project/${route.params.projectId}/bugs/add`" label="Add bug"/>
       <QBtn label="Filter"/>
-    </div>
   </div>
   <div v-if="!!bugs && bugs.length > 0">
+  <!--Table to show bugs-->
     <QMarkupTable>
         <thead>
           <tr>
@@ -39,36 +37,42 @@
               </QChip>
             </td>
             <td>
-              <QBtnDropdown v-if="(x as BugPreviewViewModel).creatorID === authStore.getUserID() || project.ownerID === authStore.getUserID()"
+              <QBtnDropdown
+              split
                 label="View"
                 :to="`/bug/${x.id}`">
                 <QList>
-                  <QItem clickable v-close-popup>
+                  <QItem clickable v-close-popup :to="`/bug/${x.id}/discussion`">
                     <QItemSection>
-                      <QItemLabel>Edit</QItemLabel>
+                      <QItemLabel>Discussion</QItemLabel>
                     </QItemSection>
                   </QItem>
-                  <QItem clickable v-close-popup>
+                  <QItem clickable v-close-popup :to="`/bug/${x.id}/settings`"
+                  v-if="(x as BugPreviewViewModel).creatorID === authStore.getUserID() || project.ownerID === authStore.getUserID()">
                     <QItemSection>
-                      <QItemLabel>Delete</QItemLabel>
+                      <QItemLabel>Settings</QItemLabel>
                     </QItemSection>
                   </QItem>
                 </QList>
               </QBtnDropdown>
-              <QBtn v-else label="View" :to="`/bug/${x.id}`"/>
             </td>
           </tr>
         </tbody>
       </QMarkupTable>
-      <QPagination v-model="currentPage"
+      <!--Pagination control for showing different bugs-->
+      <div class="row">
+      <QSpace/>
+        <QPagination v-model="currentPage"
         :min="1"
         :max="numberOfPages"
         input
         @update:model-value="getBugs"/>
+      </div>
       <QInnerLoading
       :showing="loading"
       label="Please wait..."/>
   </div>
+  <!--Message if project has no bugs-->
   <h5 v-else>This project has no bugs.</h5>
   </div>
 </template>
@@ -77,7 +81,7 @@ import UserIcon from '@/components/UserIcon.vue';
 import BugPreviewViewModel from '@/viewmodels/BugPreviewViewModel';
 import axios from 'axios';
 import { onBeforeMount, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
 import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import formatDate from '@/classes/helpers/FormatDate';
@@ -101,6 +105,7 @@ const project = ref(new ProjectViewModel());
 const loading = ref(false);
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 
 onBeforeMount(async() =>{
@@ -108,6 +113,7 @@ onBeforeMount(async() =>{
   const response = await axios.get(`/bugs/getnumberofbugs/${route.params.projectId}`);
   totalBugs.value = response.data;
   numberOfPages.value = Math.ceil(totalBugs.value/20);
+  if(totalBugs.value % 20 === 0) numberOfPages.value--;
 
   const projectResponse = await axios.get(`/projects/get/${route.params.projectId}`);
   project.value = projectResponse.data;

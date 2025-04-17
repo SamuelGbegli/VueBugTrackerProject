@@ -83,7 +83,7 @@ namespace VueBugTrackerProject.Server.Controllers
                         commentContainer.Comments.Add(new CommentViewModel(comment));
                     else
                     {
-                        var reply = comments.Find(c => c.CommentReply == comment);
+                        var reply = comments.Find(c => c == comment.CommentReply);
                         commentContainer.Comments.Add(new CommentViewModel(comment, reply));
                     }
                 }
@@ -222,7 +222,8 @@ namespace VueBugTrackerProject.Server.Controllers
                 //Goes through all the comment's replies and indicates the source comment
                 //has been removed
                 var replies = await _dbContext.Comments
-                    .Include(c => c.CommentReply == comment).ToListAsync();
+                    .Include(c => c.CommentReply)
+                    .Where(c => c.CommentReply == comment).ToListAsync();
                 foreach (var reply in replies) 
                     reply.IsCommentReplyDeleted = true;
 

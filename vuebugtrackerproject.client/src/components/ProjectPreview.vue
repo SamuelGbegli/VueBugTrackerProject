@@ -7,11 +7,11 @@
       <UserIcon
       :username="Project?.ownerName"
       :icon="Project?.ownerIcon"/>
-     <div class="text-subtitle2">Open bugs: {{ Project?.openBugs }}/{{ Project?.totalBugs }}</div>
+     <div class="text-subtitle2">Total bugs: {{ Project?.totalBugs }} ({{ Project?.openBugs }} open)</div>
       <div class="text-subtitle2">Last updated: {{ formatDate(Project.dateModified) }}</div>
     </QCardSection>
     <QCardActions align="right">
-      <QBtn :to="`project/${Project?.id}`" label="View"/>
+      <QBtn :to="`/project/${Project?.id}`" label="View"/>
     </QCardActions>
   </QCard>
 </template>

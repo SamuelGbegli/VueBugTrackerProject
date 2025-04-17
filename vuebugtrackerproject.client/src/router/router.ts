@@ -1,6 +1,7 @@
 import AccountRecoveryPage from "@/pages/auth/AccountRecoveryPage.vue";
 import PasswordResetPage from "@/pages/auth/PasswordResetPage.vue";
 import RegistrationPage from "@/pages/auth/RegistrationPage.vue";
+import BrowsePage from "@/pages/BrowsePage.vue";
 import BugDiscussionPage from "@/pages/bugs/BugDiscussionPage.vue";
 import BugSettingsPage from "@/pages/bugs/BugSettingsPage.vue";
 import ViewBugPage from "@/pages/bugs/ViewBugPage.vue";
@@ -39,6 +40,14 @@ const router = createRouter({
       {
         path: "resetpassword",
         component: PasswordResetPage
+      },
+      {
+        path: "browse/",
+        component: BrowsePage
+      },
+      {
+        path: "browse/:page",
+        component: BrowsePage
       },
       {
         path: "createproject",

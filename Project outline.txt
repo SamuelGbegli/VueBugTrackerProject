@@ -26,10 +26,8 @@ Future plans
 show error message when user goes to project they cannot see
 
 Project Requirements:
-  Landing page (done, except for links to browse page and user projects pags)
-  Browse page (not done)
-    A grid of projects and pagination (not done)
-    Sorting and filtering (not done)
+  Landing page (done, except for link touser projects page)
+  Browse page (done)
   Logging in, Registration and account recovery (all done)
   navbar (mostly done)
   Creating new projects (done)
@@ -40,9 +38,12 @@ Project Requirements:
   Editing bugs (in progress)
   Viewing bugs (done)
   Deleting bugs (done)
+  Bug commenting and logging (done)
+
+  
   Project settings (not done)
+  Searching for projects (not done)
   Admin only user list page (not done)
-  Bug commenting and logging (in progress)
   User profile (not done)
   User projects (not done)
   User settings (not done)
@@ -66,7 +67,6 @@ Noted glitches:
 - Password reset error is briefly visible when valid ID and token is supplied
 - Users are not redirected when logging in while on a page only non-logged in users are supposed to see
 - Log in prompt is briefly visible when accessing a restricted page
-- User icon is not aligned with buttons in navbar
 - Page elements do not refresh when logging out
 - No loading control in bug overview page
 - Project overview does not show number of bugs

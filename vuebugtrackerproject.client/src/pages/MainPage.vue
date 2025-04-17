@@ -30,7 +30,7 @@
             </QCard>
           </div>
         </QCardSection>
-        <!--TODO: link to user's project page-->
+        <!--TODO: link to user's projects page-->
         <QCardActions align="right">
           <QBtn label="View more"/>
         </QCardActions>
@@ -56,8 +56,7 @@
           </div>
         </QCardSection>
         <QCardActions align="right">
-        <!--TODO: link to browse page-->
-          <QBtn label="View more"/>
+          <QBtn to="/browse" label="View more"/>
         </QCardActions>
       </QCard>
     </div>

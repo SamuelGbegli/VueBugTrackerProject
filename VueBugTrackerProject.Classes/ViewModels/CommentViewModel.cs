@@ -94,13 +94,16 @@ namespace VueBugTrackerProject.Classes
             Edited = comment.Edited;
             IsCommentReplyDeleted = comment.IsCommentReplyDeleted;
 
+            //Assigns reply if comment has one
             if (reply != null)
             {
                 ReplyCommentID = reply.ID;
-                ReplyCommentText = reply.Text.Substring(0,100);
-                if(ReplyCommentText != reply.Text) 
-                    ReplyCommentText += "...";
-                ReplyCommentOwnerID = reply.Owner.Id;
+
+                //Truncates reply text if it's longer than 103 characters
+                if (reply.Text.Length > 103)
+                    ReplyCommentText = reply.Text.Substring(0, 100) + "...";
+                else ReplyCommentText = reply.Text;
+                    ReplyCommentOwnerID = reply.Owner.Id;
                 ReplyCommentOwnerName = reply.Owner.UserName;
                 ReplyCommentOwnerIcon = reply.Owner.Icon;
             }

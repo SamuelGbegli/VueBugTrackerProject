@@ -11,9 +11,9 @@
           VueBugTracker
         </QToolbarTitle>
         <QSpace/>
-        <div class="q-pa-md q-gutter-md">
+        <div class="q-pa-md row items-center q-gutter-md">
           <QBtn to="/" label="Home"/>
-        <QBtn to="#" label="Browse"/>
+        <QBtn to="/browse" label="Browse"/>
         <!-- section for non logged in users -->
         <QBtn v-if="!authStore.isLoggedIn()" @click="showLoginDialog" label="Login"/>
         <QBtn v-if="!authStore.isLoggedIn()" to="register" label="Register"/>
@@ -101,7 +101,7 @@
     </QDrawer>
 
     <QPageContainer>
-      <router-view />
+      <router-view :key="route.fullPath" />
     </QPageContainer>
 
     <!--App footer-->
@@ -124,12 +124,16 @@ import { Dialog, Loading } from 'quasar';
 
 import UserIcon from '@/components/UserIcon.vue';
 import LoginDialog from '@/dialogs/LoginDialog.vue';
+import { useRoute } from 'vue-router';
 import router from '@/router/router';
 
 import { useAuthStore } from '@/stores/AuthStore';
 
 //Store for getting logged in user info
 const authStore = useAuthStore();
+
+//Gets the current page's route
+const route = useRoute();
 
 //If true, shows a list of user quick links
 const rightDrawerOpen = ref(false);

@@ -71,10 +71,10 @@ namespace VueBugTrackerProject.Server.Controllers
         /// Gets a list of projects in the database.
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("get")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProjects()
+        public async Task<IActionResult> GetProjects([FromQuery] int pageNumber = 1)
         {
             try
             {
@@ -98,19 +98,55 @@ namespace VueBugTrackerProject.Server.Controllers
                     projects = projects.Where(p => p.Visibility != Visibility.Restricted || p.UserPermissions.Any(up => up.Account == account)).ToList();
                 }
 
+                var projectContainer = new ProjectContainer { TotalProjects = projects.Count};
+
                 //Creates view models based on projects found
-                foreach (var project in projects)
+                foreach (var project in projects.OrderByDescending(p => p.DateModified).Skip(30 * (pageNumber - 1)).Take(30))
                 {
-                    projectPreviews.Add(new ProjectPreviewViewModel(project));
+                    projectContainer.Projects.Add(new ProjectPreviewViewModel(project));
                 }
+
                 //Returns the projects
-                return Ok(projectPreviews);
+                    return Ok(projectContainer);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
 
+        }
+
+        /// <summary>
+        /// Returns the number of projects the user can see.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getprojectcount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNumberOfProjects()
+        {
+            try
+            {
+                //Gets all projects
+                var projects = await _dbContext.Projects.ToListAsync();
+
+                //If user is not logged in, only return projects that can be seen by all
+                if (!User.Identity.IsAuthenticated)
+                    projects = projects.Where(p => p.Visibility == Visibility.Public).ToList();
+                else
+                {
+                    //If user is logged in, return projects that are public, available to logged in users only
+                    //or are hidden and the user is allowed to view or edit them
+                    var account = await _userManager.GetUserAsync(User);
+                    projects = projects.Where(p => p.Visibility != Visibility.Restricted || p.UserPermissions.Any(up => up.Account == account)).ToList();
+                }
+
+                return Ok(projects.Count);
+
+            }
+            catch (Exception ex) {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         /// <summary>
@@ -186,7 +222,10 @@ namespace VueBugTrackerProject.Server.Controllers
             try
             {
                 //Looks for project by ID
-                var project = await _dbContext.Projects.Include(p => p.Owner).FirstOrDefaultAsync(p => p.ID == projectId);
+                var project = await _dbContext.Projects
+                    .Include(p => p.Owner)
+                    .Include(p => p.Bugs)
+                    .FirstOrDefaultAsync(p => p.ID == projectId);
 
                 //Returns error if project does not exist
                 if (project == null) return NotFound("Project does not exist");

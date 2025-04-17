@@ -18,7 +18,8 @@
         <h5>Project details</h5>
       </QCardSection>
       <QCardSection>
-        <h6>Created on {{ formatDate(project.dateCreated) }}</h6>
+        <h6>Date created</h6>
+        <span>{{ formatDate(project.dateCreated) }}</span>
       </QCardSection>
       <QCardSection>
         <h6>Owner</h6>

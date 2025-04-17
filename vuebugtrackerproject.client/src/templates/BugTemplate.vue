@@ -2,12 +2,9 @@
   <div v-if="statusCode === 200">
     <QBanner>
     <div class="row">
-      <div class="col">
         <h3>{{ bug.projectName }}/Bugs</h3>
-      </div>
-      <div class="col-2">
-          <QBtn label="Back to main" :to="`/project/${bug.projectID}`"/>
-      </div>
+        <QSpace/>
+        <QBtn label="Back to main" :to="`/project/${bug.projectID}`"/>
     </div>
       <h6>{{ bug.summary }}</h6>
       <h6>Last updated: {{ formatDate(bug.dateModified) }}</h6>

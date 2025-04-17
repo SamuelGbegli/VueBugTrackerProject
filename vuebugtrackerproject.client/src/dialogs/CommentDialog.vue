@@ -37,12 +37,13 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
 
-  import { useDialogPluginComponent, Loading } from 'quasar';
+  import { useDialogPluginComponent, Loading, Notify } from 'quasar';
   import UserDTO from '@/classes/DTOs/UserDTO';
 import CommentViewModel from '@/viewmodels/CommentViewModel';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useRoute } from 'vue-router';
 import CommentDTO from '@/classes/DTOs/CommentDTO';
+import axios from 'axios';
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -72,6 +73,11 @@ onBeforeMount(() =>{
 
 //Posts the comment
 async function onSubmit() {
+
+  Loading.show({
+    message: "Please wait..."
+  });
+
   let commentDTO = new CommentDTO();
 
     commentDTO.ownerID = authStore.getUserID();
@@ -86,7 +92,27 @@ async function onSubmit() {
     if(!!props.replyComment)
       commentDTO.replyID = props.replyComment.id;
 
+    //Submits comment
+    try{
+      let response = "";
+      //Block for adding new comment
+      if(commentDTO.commentID === "")
+        response = await axios.post("/comments/add", commentDTO);
+      //Block for editing existing comment
+      else
+        response = await axios.patch("/comments/update", commentDTO);
+    }
+    catch{
+      Notify.create({
+    message: "Something went wrong when processing your request. Please try again later.",
+    position: "bottom",
+    type: "negative"
+    });
+    }
+
     console.log(commentDTO);
+
+    Loading.hide();
     onDialogOK();
     //TODO: add post and push functions for comments
 }

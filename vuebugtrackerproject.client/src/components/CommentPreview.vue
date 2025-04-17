@@ -1,14 +1,24 @@
 <template>
-  <h6>{{ comment.edited? `${formatDate(comment.datePosted)} (Edited)` : `${formatDate(comment.datePosted)}` }}</h6>
+  <div class="row">
+    <QSpace/>
+    <!--Shows when the comment was posted. If the user edited it "(Edited)" is also shown-->
+    <h6>{{ comment?.edited? `${formatDate(comment.datePosted)} (Edited)` : `${formatDate(comment.datePosted)}` }}</h6>
+  </div>
   <QCard>
     <QCardSection>
-      <UserIcon/>
+    <!--Shows username and icon of comment poster-->
+      <UserIcon :username="props.comment?.ownerName"/>
+      <!--Shows a preview of the comment being replied to-->
       <QCard v-if="!!props.comment?.replyCommentID">
         <QCardSection>
           <UserIcon :username="props.comment.replyCommentOwnerName"/>
           <p>{{ props.comment.replyCommentText }}</p>
         </QCardSection>
       </QCard>
+      <!--Message if comment being replied to has been deleted-->
+      <QBanner v-if="props.comment?.isCommentReplyDeleted">
+        The original comment has been deleted.
+      </QBanner>
       <p>{{ props.comment?.text }}</p>
     </QCardSection>
   </QCard>
@@ -19,6 +29,7 @@ import UserIcon from './UserIcon.vue';
 import formatDate from '@/classes/helpers/FormatDate';
 
 const props = defineProps({
+  //The comment being bound
   comment: CommentViewModel
 });
 
