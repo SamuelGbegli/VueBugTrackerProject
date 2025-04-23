@@ -76,6 +76,149 @@ namespace VueBugTrackerProject.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a preview of a project's bugs, filtered and sorted by the user.
+        /// </summary>
+        /// <param name="bugFilterDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("getbugpreviews")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProjectBugPreviews([FromBody] BugFilterDTO bugFilterDTO)
+        {
+            try
+            {
+                //Gets project to ensure it exists
+                var project = await _databaseContext.Projects
+                    .Include(p => p.Owner)
+                    .FirstOrDefaultAsync(p => p.ID == bugFilterDTO.ProjectID);
+                if (project == null) return NotFound();
+
+                // For restricted projects, checks if user has been granted permission to view it
+                if (project.Visibility == Visibility.Restricted)
+                {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null) return Unauthorized("Restricted project");
+
+                    //Bounces user if they do not own the project or have permission to view it
+                    if (project.Owner != currentUser && !project.UserPermissions.Any(up => up.Account == currentUser))
+                        return Forbid();
+                }
+
+                //For projects only visible to logged in users, checks if user is logged in
+                if (project.Visibility == Visibility.LoggedInOnly)
+                {
+                    if (!User.Identity.IsAuthenticated) return Unauthorized("Login reqired");
+                }
+
+                //Gets bugs
+                var bugs = await _databaseContext.Bugs
+                    .Include(b => b.Creator)
+                    .Where(b => b.Project == project)
+                    .ToListAsync();
+
+                //Filtering starts here
+                //1. Filters bugs based on summary
+                if (!string.IsNullOrWhiteSpace(bugFilterDTO.Summary))
+                {
+                    //Query is split by spacing and made lower case
+                    var queries = bugFilterDTO.Summary.ToLower().Split(' ');
+                    //Searches for matches in summary and description
+                    bugs = bugs.Where(b => queries.Any(q =>
+                        b.Summary.ToLower().Contains(q) ||
+                        b.Description.ToLower().Contains(q)))
+                        .ToList();
+                }
+
+                //2. Filters bugs on creator name
+                if (!string.IsNullOrWhiteSpace(bugFilterDTO.CreatorName))
+                {
+                    //Splits creator name query by space and make lower case
+                    var queries = bugFilterDTO.CreatorName.ToLower().Split(' ');
+
+                    bugs = bugs.Where(b => queries.Any(q =>
+                        b.Creator.UserName.ToLower().Contains(q)))
+                        .ToList();
+                }
+
+                //3. Filters on severity and status 
+                if(bugFilterDTO.SeverityValues.Count > 0)
+                    bugs = bugs.Where(b => bugFilterDTO.SeverityValues.Contains(b.Severity)).ToList();
+    
+                if(bugFilterDTO.StatusValues.Count > 0)
+                    bugs = bugs.Where(b => bugFilterDTO.StatusValues.Contains(b.Status)).ToList();
+
+                //4. Filters bug by date range
+                //Skips if both date values are null
+                if (bugFilterDTO.DateFrom != null || bugFilterDTO.DateEnd != null)
+                {
+                    //All filter options check whether to search for the date the 
+                    //project was created or modified
+
+                    //Filters projects from a certain date if DateEnd value is null
+                    if (bugFilterDTO.DateEnd == null)
+                        bugs = bugs.Where(b =>
+                            bugFilterDTO.DateSearch == DateSearch.CreatedDate ?
+                            b.DateCreated >= bugFilterDTO.DateFrom :
+                            b.DateModified >= bugFilterDTO.DateFrom).ToList();
+
+                    //Filters projects up to a certain date if DateFrom value is null
+                    else if (bugFilterDTO.DateFrom == null)
+                        bugs = bugs.Where(b =>
+                            bugFilterDTO.DateSearch == DateSearch.CreatedDate ?
+                            b.DateCreated <= bugFilterDTO.DateEnd :
+                            b.DateModified <= bugFilterDTO.DateEnd).ToList();
+
+                    //Filters projects on range between the earliest and latest dates
+                    else
+                    {
+                        //Stores date ranges as a list
+                        var dates = new List<DateTime> { bugFilterDTO.DateFrom.Value, bugFilterDTO.DateEnd.Value };
+
+                        bugs = bugs.Where(b =>
+                            bugFilterDTO.DateSearch == DateSearch.CreatedDate ?
+                            b.DateCreated >= dates.Min() && b.DateCreated <= dates.Max() :
+                            b.DateModified >= dates.Min() && b.DateModified <= dates.Max()).ToList();
+                    }
+                }
+
+                //5. Sorts bugs by order specified
+                switch (bugFilterDTO.SortType)
+                {
+                    case SortType.Name:
+                        if (bugFilterDTO.SortOrder == SortOrder.Ascending)
+                            bugs = bugs.OrderBy(b => b.Summary).ToList();
+                        else bugs = bugs.OrderByDescending(b => b.Summary).ToList();
+                        break;
+
+                    case SortType.CreatedDate:
+                        if (bugFilterDTO.SortOrder == SortOrder.Ascending)
+                            bugs = bugs.OrderBy(b => b.DateCreated).ToList();
+                        else bugs = bugs.OrderByDescending(b => b.DateCreated).ToList();
+                        break;
+
+                    case SortType.LastUpdated:
+                        if (bugFilterDTO.SortOrder == SortOrder.Ascending)
+                            bugs = bugs.OrderBy(b => b.DateModified).ToList();
+                        else bugs = bugs.OrderByDescending(b => b.DateModified).ToList();
+                        break;
+                }
+
+                //Creates and returns a list of bug summaries
+                var bugPreviews = new List<BugPreviewViewModel>();
+                foreach (var bug in bugs.OrderByDescending(b => b.DateModified).Skip((bugFilterDTO.PageNumber - 1) * 20).Take(20))
+                {
+                    bugPreviews.Add(new BugPreviewViewModel(bug));
+                }
+                return Ok(bugPreviews);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
         [HttpGet]
         [Route("get/{bugId}")]
         [AllowAnonymous]
@@ -255,7 +398,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 if(bug.Severity != bugDTO.Severity)
                     bug.Comments.Add(new Comment {
                         Owner = account,
-                        Text = $"Changed bug severity to ${(bugDTO.Severity == Severity.Low ? "Low" : bugDTO.Severity == Severity.Medium ? "Medium" : "High")}",
+                        Text = $"Changed bug severity to {(bugDTO.Severity == Severity.Low ? "Low" : bugDTO.Severity == Severity.Medium ? "Medium" : "High")}",
                         IsStatusUpdate = true,
                         DatePosted = DateTime.UtcNow
                     });
@@ -263,9 +406,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 //Updates bug
                 bug.Summary = bugDTO.Summary;
                 bug.Description = bugDTO.Description;
-                bug.Severity = bugDTO.Severity;
                 bug.Status = bugDTO.IsOpen ? Status.Open : Status.Closed;
-                //TODO: add bug status update message
                 bug.DateModified = DateTime.UtcNow;
                 project.DateModified = DateTime.UtcNow;
 

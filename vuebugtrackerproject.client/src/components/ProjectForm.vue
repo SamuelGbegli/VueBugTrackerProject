@@ -1,5 +1,4 @@
 <!--Form to create or save changes to a project-->
-<!--TODO: add edit mode for existing projects-->
 <template>
   <QCard style=" max-width: 1200px;">
     <QForm @submit="onSubmit">
@@ -59,10 +58,15 @@
 import removeHTMLTags from '@/classes/helpers/RemoveHTMLTags';
 import sanitiseHTML from '@/classes/helpers/SanitiseHTML';
 import Visibility from '@/enumConsts/Visibility';
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { Loading, Notify } from 'quasar'
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import ProjectViewModel from '@/viewmodels/ProjectViewModel';
+
+  const props = defineProps({
+    Project: ProjectViewModel
+  })
 
   const options = ["Visible to everyone", "Visible to logged in users only", "Visible to selected users only"];
 
@@ -73,7 +77,22 @@ import { useRouter } from 'vue-router';
   const description = ref("");
   const tags = ref("");
 
+  const route = useRoute();
   const router = useRouter();
+
+  //Populates values if project is being edited
+  onBeforeMount(() =>{
+    if(!!props.Project){
+      projectName.value = props.Project.name;
+      summary.value = props.Project.summary;
+      link.value = props.Project.link;
+      visibility.value = options[props.Project.visibility]
+      description.value = props.Project.description;
+      tags.value = props.Project.tags.join(",");
+
+    console.log((props.Project));
+    }
+  });
 
 // Submits form to server
   async function onSubmit() {
@@ -91,15 +110,21 @@ import { useRouter } from 'vue-router';
     projectDTO.FormattedDescription = description.value;
     projectDTO.Tags = tags.value.split(",");
 
-    // console.log(sanitiseHTML(description.value));
-    // console.log(removeHTMLTags(description.value));
-    // console.log(projectDTO);
 
     try{
-      const response = await axios.post("/projects/create", projectDTO);
-      if(response.status === 201){
-        console.log(response.headers.location);
-        router.push({path:response.headers.location});
+      //Block for editing project
+      if(!!props.Project){
+        projectDTO.ProjectID = route.params.projectId.toString();
+        await axios.patch("/projects/update", projectDTO);
+        router.go(0);
+      }
+      //Block for adding new project
+      else{
+        const response = await axios.post("/projects/create", projectDTO);
+        if(response.status === 201){
+          console.log(response.headers.location);
+          router.push({path:response.headers.location});
+        }
       }
     }
     catch(ex){

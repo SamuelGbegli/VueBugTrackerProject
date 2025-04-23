@@ -114,6 +114,5 @@ async function onSubmit() {
 
     Loading.hide();
     onDialogOK();
-    //TODO: add post and push functions for comments
 }
 </script>

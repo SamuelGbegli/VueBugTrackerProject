@@ -1,5 +1,6 @@
 //View model for a project.
 
+import Visibility from "@/enumConsts/Visibility";
 import AccountViewModel from "./AccountViewModel";
 
 export default class ProjectViewModel{
@@ -12,6 +13,8 @@ export default class ProjectViewModel{
 	summary: string = "";
 	// The project's external link.
 	link: string = "";
+  // The project's visibility.
+  visibility: number = Visibility.Public;
 	// The ID of the user that created the project.
 	ownerID: string =  "";
 	// The name of the user that created the project.

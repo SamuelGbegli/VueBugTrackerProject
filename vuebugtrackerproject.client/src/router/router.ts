@@ -11,7 +11,9 @@ import Sandbox from "@/pages/other/sandbox.vue";
 import AddBugPage from "@/pages/projects/AddBugPage.vue";
 import CreateProjectPage from "@/pages/projects/CreateProjectPage.vue";
 import ProjectBugsPage from "@/pages/projects/ProjectBugsPage.vue";
+import ProjectSettingsPage from "@/pages/projects/ProjectSettingsPage.vue";
 import ViewProjectPage from "@/pages/projects/ViewProjectPage.vue";
+import SearchPage from "@/pages/SearchPage.vue";
 import BugTemplate from "@/templates/BugTemplate.vue";
 import MainTemplate from "@/templates/MainTemplate.vue";
 import ProjectTemplate from "@/templates/ProjectTemplate.vue";
@@ -50,6 +52,10 @@ const router = createRouter({
         component: BrowsePage
       },
       {
+        path: "search",
+        component: SearchPage
+      },
+      {
         path: "createproject",
         component: CreateProjectPage
       },
@@ -76,6 +82,10 @@ const router = createRouter({
           {
             path: ":projectId/bugs/add",
             component: AddBugPage
+          },
+          {
+            path: ":projectId/settings",
+            component: ProjectSettingsPage
           }
         ]
       },

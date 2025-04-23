@@ -9,7 +9,7 @@
       <QRouteTab label="Main" :to="`/project/${project.id}`"/>
       <QRouteTab label="Bugs" :to="`/project/${project.id}/bugs`"/>
       <!--hidden if user does not own project-->
-      <QRouteTab v-if="!!authStore.user && authStore.user.id === project.ownerID" label="Settings" :to="`#`"/>
+      <QRouteTab v-if="!!authStore.user && authStore.user.id === project.ownerID" label="Settings" :to="`/project/${project.id}/settings`"/>
     </QTabs>
     <router-view />
   </div>
@@ -38,7 +38,6 @@ const route = useRoute();
 
 onMounted(async ()=>{
 
-  //TODO: add error handling if project cannot be fetched from database
   try{
   //Loads project from database
     const response = await axios.get(`/projects/get/${route.params.projectId}`);

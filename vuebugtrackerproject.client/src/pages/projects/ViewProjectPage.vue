@@ -74,6 +74,8 @@ import formatDate from '@/classes/helpers/FormatDate';
       const response = await axios.get(`/projects/get/${route.params.projectId}`);
       statusCode.value = response.status;
       project.value = response.data;
+
+      console.log(project.value.tags);
     }
     catch (ex){
       let error = ex as AxiosError;

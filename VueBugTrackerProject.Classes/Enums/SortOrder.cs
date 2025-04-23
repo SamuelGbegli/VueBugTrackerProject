@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace VueBugTrackerProject.Classes
 {
     /// <summary>
-    /// Enum to determine the order projects are sorted
+    /// Enum to determine the order projects are sorted.
     /// </summary>
     public enum SortOrder
     {

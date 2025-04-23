@@ -26,23 +26,30 @@
       </div>
     </QTabPanel>
     <QTabPanel name="Other">
-      <span>Work in progress</span>
-      <div class="row">
+      <QCard>
+        <QCardSection>
+          <div class="row">
         <div class="col">
-          Click the button on the right to close/reopen the bug.
+          Click the button on the right to {{bug.isOpen? "close" : "reopen"}} the bug.
         </div>
         <div class="col-2">
-          <QBtn label="Close bug"/>
+          <QBtn @click="showBugToggleDialog" :label="bug.isOpen? 'Close bug' : 'Reopen bug'"/>
         </div>
       </div>
-      <div class="row">
-        <div class="col">
-          Click the button on the right to delete the bug.
-        </div>
-        <div class="col-2">
-          <QBtn @click="deleteBug" label="Delete bug"/>
-        </div>
-      </div>
+        </QCardSection>
+      </QCard>
+      <QCard>
+        <QCardSection>
+          <div class="row">
+            <div class="col">
+              Click the button on the right to delete the bug.
+            </div>
+            <div class="col-2">
+              <QBtn @click="deleteBug" label="Delete bug"/>
+            </div>
+          </div>
+        </QCardSection>
+      </QCard>
     </QTabPanel>
     </QTabPanels>
 </div>
@@ -83,6 +90,37 @@ const bugSeverity = ["Low", "Medium", "High"];
         statusCode.value = error.status;
       }
     });
+
+    //Shows dialog to open a closed bug, and vice versa
+    function showBugToggleDialog(){
+    Dialog.create({
+      component: ConfirmationDialog,
+      componentProps:{
+        header: bug.value.isOpen ? "Close bug" : "Reopen bug",
+        message: bug.value.isOpen ? "Are you sure you want to close this bug?"
+        : "Are you sure you want to reopen this bug?"
+      }
+    }).onOk(async () =>{
+
+      Loading.show({
+        message: "Please wait..."
+      });
+      try{
+        const response = await axios.patch("/bugs/togglebugstatus", bug.value.id,{
+          headers: {"Content-Type": "application/json"}
+        });
+        router.go(0);
+      }
+      catch{
+        Notify.create({
+          message: "Something went wrong when processing your request. Please try again later.",
+          position: "bottom",
+          type: "negative"
+        });
+      }
+      Loading.hide();
+    })
+  }
 
   async function deleteBug(){
     //Creates delete dialog

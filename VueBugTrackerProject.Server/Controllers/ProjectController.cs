@@ -65,8 +65,6 @@ namespace VueBugTrackerProject.Server.Controllers
             }
         }
 
-        //TODO:
-        //Add filtering, pagination
         /// <summary>
         /// Gets a list of projects in the database.
         /// </summary>
@@ -114,6 +112,139 @@ namespace VueBugTrackerProject.Server.Controllers
                 return StatusCode(500, ex.Message);
             }
 
+        }
+
+        /// <summary>
+        /// Returns a list of sorted and filtered projects from the database.
+        /// </summary>
+        /// <param name="filterDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchProjects([FromBody] FilterDTO filterDTO)
+        {
+            try
+            {
+                var projectPreviews = new List<ProjectPreviewViewModel>();
+
+                //Gets all projects, with their owners and lists of bugs
+                var projects = await _dbContext.Projects
+                    .Include(p => p.Owner)
+                    .Include(p => p.Bugs)
+                    .ToListAsync();
+
+                //If user is not logged in, only return projects that can be seen by all
+                if (!User.Identity.IsAuthenticated)
+                    projects = projects.Where(p => p.Visibility == Visibility.Public).ToList();
+                else
+                {
+                    //If user is logged in, return projects that are public, available to logged in users only
+                    //or are hidden and the user is allowed to view or edit them
+                    var account = await _userManager.GetUserAsync(User);
+                    projects = projects.Where(p => p.Visibility != Visibility.Restricted || p.UserPermissions.Any(up => up.Account == account)).ToList();
+                }
+
+                //Filtering starts here
+                //1. Searches for projects by name, summary or tag
+                if (!string.IsNullOrWhiteSpace(filterDTO.Query))
+                {
+                    //Splits query by spaces
+                    var queries = filterDTO.Query.ToLower().Split(' ');
+                    //Checks if project name, summary or tags matches with query text
+                    //Values are converted to lower case
+                    projects = projects.Where(p =>
+                    queries.Any(q => p.Name.ToLower().Contains(q)
+                        || p.Summary.ToLower().Contains(q)
+                        || p.Tags.Any(t => t.ToLower() == q))).ToList();
+                    
+                }
+                //2. Checks if projects have any open bugs or none
+                switch (filterDTO.ProjectType)
+                {
+                    //Returns all projects with at least one open bug
+                    case ProjectType.OpenBugsOnly:
+                        projects = projects.Where(p => p.Bugs.Any(b => b.Status == Status.Open)).ToList();
+                        break;
+                    //Return all projects where all bugs are closed
+                    //Maty not return projects with 0 bugs
+                    case ProjectType.NoOpenBugs:
+                        projects = projects.Where(p => p.Bugs.All(b => b.Status == Status.Closed)).ToList();
+                        break;
+                }
+
+                //3. Filters projects by date range
+                //Skips if both date values are null
+                if (filterDTO.DateFrom != null || filterDTO.DateEnd != null)
+                {
+                    //All filter options check whether to search for the date the 
+                    //project was created or modified
+
+                    //Filters projects from a certain date if DateEnd value is null
+                    if(filterDTO.DateEnd == null)
+                        projects = projects.Where(p => 
+                            filterDTO.DateSearch == DateSearch.CreatedDate ?
+                            p.DateCreated >= filterDTO.DateFrom :
+                            p.DateModified >= filterDTO.DateFrom).ToList();
+
+                    //Filters projects up to a certain date if DateFrom value is null
+                    else if (filterDTO.DateFrom == null)
+                        projects = projects.Where(p =>
+                            filterDTO.DateSearch == DateSearch.CreatedDate ?
+                            p.DateCreated <= filterDTO.DateEnd :
+                            p.DateModified <= filterDTO.DateEnd).ToList();
+                    
+                    //Filters projects on range between the earliest and latest dates
+                    else
+                    {
+                        //Stores date ranges as a list
+                        var dates = new List<DateTime> { filterDTO.DateFrom.Value, filterDTO.DateEnd.Value };
+
+                        projects = projects.Where(p =>
+                            filterDTO.DateSearch == DateSearch.CreatedDate ?
+                            p.DateCreated >= dates.Min() && p.DateCreated <= dates.Max() :
+                            p.DateModified >= dates.Min() && p.DateModified <= dates.Max()).ToList();
+                    }
+                }
+
+                //4. Sorts projects by order specified
+                switch (filterDTO.SortType)
+                {
+                    case SortType.Name:
+                        if(filterDTO.SortOrder == SortOrder.Ascending)
+                            projects = projects.OrderBy(p => p.Name).ToList();
+                        else projects = projects.OrderByDescending(p => p.Name).ToList();
+                        break;
+
+                    case SortType.CreatedDate:
+                        if (filterDTO.SortOrder == SortOrder.Ascending)
+                            projects = projects.OrderBy(p => p.DateCreated).ToList();
+                        else projects = projects.OrderByDescending(p => p.DateCreated).ToList();
+                        break;
+
+                    case SortType.LastUpdated:
+                        if (filterDTO.SortOrder == SortOrder.Ascending)
+                            projects = projects.OrderBy(p => p.DateModified).ToList();
+                        else projects = projects.OrderByDescending(p => p.DateModified).ToList();
+                        break;
+                }
+
+                var projectContainer = new ProjectContainer { TotalProjects = projects.Count };
+
+                //Creates view models based on projects found
+                foreach (var project in projects.Skip(30 * (filterDTO.PageNumber - 1)).Take(30))
+                {
+                    projectContainer.Projects.Add(new ProjectPreviewViewModel(project));
+                }
+
+                //Returns the projects
+                return Ok(projectContainer);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         /// <summary>
@@ -257,6 +388,63 @@ namespace VueBugTrackerProject.Server.Controllers
         }
 
         /// <summary>
+        /// Updates an existing project.
+        /// </summary>
+        /// <param name="projectDTO"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("update")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO)
+        {
+            try
+            {
+                //Looks for project by ID
+                var project = await _dbContext.Projects
+                    .Include(p => p.Owner)
+                    .FirstOrDefaultAsync(p => p.ID == projectDTO.ProjectID);
+
+                //Returns error if project does not exist
+                if (project == null) return NotFound("Project does not exist");
+
+                //For restricted projects, checks if user has been granted permission to view it
+                if (project.Visibility == Visibility.Restricted)
+                {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null) return Unauthorized("Restricted project");
+
+                    //Bounces user if they do not own the project or have permission to view it
+                    if (project.Owner != currentUser && !project.UserPermissions.Any(up => up.Account == currentUser))
+                        return Forbid();
+                }
+
+                //For projects only visible to logged in users, checks if user is logged in
+                if (project.Visibility == Visibility.LoggedInOnly)
+                {
+                    if (!User.Identity.IsAuthenticated) return Unauthorized("Login reqired");
+                }
+
+                //Updates project and saves changes
+                project.Name = projectDTO.Name;
+                project.Summary = projectDTO.Summary;
+                project.Visibility = projectDTO.Visibility;
+                project.Link = projectDTO.Link;
+                project.Description = projectDTO.Description;
+                project.FormattedDescription = projectDTO.FormattedDescription;
+                project.Tags = projectDTO.Tags;
+                project.DateModified = DateTime.UtcNow;
+
+                await _dbContext.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Deletes a project.
         /// </summary>
         /// <param name="projectID"></param>
@@ -271,6 +459,9 @@ namespace VueBugTrackerProject.Server.Controllers
                 //Ensures user is logged in
                 var currentUser = await _userManager.GetUserAsync(User);
                 if (currentUser == null) return BadRequest();
+
+                //Bounces if project is the one used to record bugs in this application
+                if (projectID == "bff592a4-c7f6-43d1-9640-469ee5d4da1e") return Forbid();
 
                 //Looks for project by ID
                 var projectToDelete = await _dbContext.Projects.FindAsync(projectID);

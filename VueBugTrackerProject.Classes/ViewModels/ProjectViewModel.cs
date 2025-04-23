@@ -25,6 +25,11 @@ namespace VueBugTrackerProject.Classes
 		/// </summary>
         public string Link { get; set; }
 
+		/// <summary>
+		/// The visibility of the project.
+		/// </summary>
+        public Visibility Visibility { get; set; }
+
         /// <summary>
         /// The ID of the user that created the project.
         /// </summary>
@@ -77,6 +82,7 @@ namespace VueBugTrackerProject.Classes
 			Name = project.Name;
 			Summary = project.Summary;
 			Link = project.Link;
+			Visibility = project.Visibility;
 			OwnerID = project.Owner.Id;
 			OwnerName = project.Owner.UserName;
 			OwnerIcon = project.Owner.Icon;

@@ -18,7 +18,8 @@
           <h5>Bug details</h5>
         </QCardSection>
         <QCardSection>
-          <h6>Created on {{ formatDate(bug.dateCreated) }}</h6>
+          <h6>Date created</h6>
+          <span>{{ formatDate(bug.dateCreated) }}</span>
         </QCardSection>
         <QCardSection>
           <h6>Created by</h6>
@@ -26,11 +27,15 @@
         </QCardSection>
         <QCardSection>
           <h6>Status</h6>
-          <span>{{ bug.isOpen ? "Open" : "Closed" }}</span>
+          <QChip :color="getChipColour(bug.isOpen ? 'Open' : 'Closed' )">
+            {{ bug.isOpen ? "Open" : "Closed" }}
+          </QChip>
         </QCardSection>
         <QCardSection>
           <h6>Severity</h6>
-          <span>{{ bugSeverity[bug.severity] }}</span>
+          <QChip :color="getChipColour(bugSeverity[bug.severity])">
+            {{ bugSeverity[bug.severity] }}
+          </QChip>
         </QCardSection>
         <QCardSection>
           <QBtn @click="showBugToggleDialog" :label="bug.isOpen ? 'Close bug' : 'Reopen bug'"/>
@@ -73,6 +78,7 @@ import BugViewModel from '@/viewmodels/BugViewModel';
 import { Dialog, Loading, Notify } from 'quasar';
 import ConfirmationDialog from '@/dialogs/ConfirmationDialog.vue';
 import formatDate from '@/classes/helpers/FormatDate';
+import getChipColour from '@/classes/helpers/GetChipColour';
 
 const bugSeverity = ["Low", "Medium", "High"];
 

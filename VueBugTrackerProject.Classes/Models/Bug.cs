@@ -62,7 +62,7 @@ namespace VueBugTrackerProject.Classes
         public DateTime DateModified { get; set; }
 
         /// <summary>
-        /// Determines whether the bug is open or closed
+        /// Determines whether the bug is open or closed.
         /// </summary>
         [Required]
         public Status Status { get; set; }

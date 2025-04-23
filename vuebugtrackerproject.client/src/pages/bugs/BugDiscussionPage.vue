@@ -16,11 +16,14 @@
       </div>
       <br/>
     </div>
-    <QPagination v-model="currentPage"
+    <div class="row">
+      <QSpace/>
+      <QPagination v-model="currentPage"
                    :min="1"
                    :max="numberOfPages"
                    @update:model-value="getComments()"
                    input />
+    </div>
       <QInnerLoading
         :showing="!commentContainer.comments"/>
 

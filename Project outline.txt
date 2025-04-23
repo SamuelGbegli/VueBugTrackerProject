@@ -35,14 +35,14 @@ Project Requirements:
   Deleting projects (not done)
   Viewing project bugs (done)
   Adding bugs (done)
-  Editing bugs (in progress)
-  Viewing bugs (done)
+  Editing bugs (done)
+  Viewing bugs (add bug filtering)
   Deleting bugs (done)
   Bug commenting and logging (done)
+  Searching for projects (done)
 
   
   Project settings (not done)
-  Searching for projects (not done)
   Admin only user list page (not done)
   User profile (not done)
   User projects (not done)
@@ -51,12 +51,7 @@ Project Requirements:
 
 
 Next steps:
-  - Closing and reopening bugs (done on bug view page)
-  - Viewing comments and status updates
-  - Bug settings (in progress)
   - project settings
-  - browsing projects
-  - Convert comment form to dialog box
 
 Noted glitches:
 - If the user logs in, logs out and logs in again, the sidebar remains open
@@ -69,4 +64,5 @@ Noted glitches:
 - Log in prompt is briefly visible when accessing a restricted page
 - Page elements do not refresh when logging out
 - No loading control in bug overview page
-- Project overview does not show number of bugs
+- when filter is reset in bug search page, the current filter values are gone
+- user can view project settings page when not the owner

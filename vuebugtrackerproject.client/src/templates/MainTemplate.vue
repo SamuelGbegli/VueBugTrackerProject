@@ -12,8 +12,9 @@
         </QToolbarTitle>
         <QSpace/>
         <div class="q-pa-md row items-center q-gutter-md">
-          <QBtn to="/" label="Home"/>
-        <QBtn to="/browse" label="Browse"/>
+          <QBtn to="/" label="home"/>
+          <QBtn to="/browse" label="Browse"/>
+          <QBtn to="/search" label="Search"/>
         <!-- section for non logged in users -->
         <QBtn v-if="!authStore.isLoggedIn()" @click="showLoginDialog" label="Login"/>
         <QBtn v-if="!authStore.isLoggedIn()" to="register" label="Register"/>

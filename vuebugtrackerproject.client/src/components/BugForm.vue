@@ -88,11 +88,13 @@ async function onSubmit(){
   console.log(JSON.stringify(bugDTO));
 
   try{
-    //block for editing existing bug
+    //block for editing an existing bug
     if(!!props.Bug){
       bugDTO.bugID = route.params.bugId.toString();
-      bugDTO.projectID = bugDTO.projectID = props.Bug.projectID;
-      console.log(bugDTO);
+      bugDTO.projectID = props.Bug.projectID;
+
+      await axios.patch("/bugs/updatebug", bugDTO);
+        router.go(0);
     }
     //Block for adding new bug
     else{

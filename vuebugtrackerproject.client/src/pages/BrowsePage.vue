@@ -3,9 +3,7 @@
   <div class="row">
     <h3>Browse</h3>
     <QSpace/>
-    <QBtn label="Filter"/>
   </div>
-  <p>Work in progress</p>
   <div v-if="!statusCode || statusCode === 200">
     <div class="row q-gutter-md">
       <ProjectPreview v-for="x in projects.projects" :-project="x"/>
