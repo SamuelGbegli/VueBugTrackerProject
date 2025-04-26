@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace VueBugTrackerProject.Classes
 {
     /// <summary>
-    /// Describes a role a user can have regarding a project they don't own.
+    /// Describes a role a user can have in a project.
     /// </summary>
     public enum ProjectPermission
     {
@@ -16,9 +16,13 @@ namespace VueBugTrackerProject.Classes
         /// </summary>
         Viewer,
         /// <summary>
-        /// Sorts projects by when they were created.
+        /// Allows the user to add and modify bugs in a project.
         /// </summary>
-        Editor
+        Editor,
+        /// <summary>
+        /// Indicates the user owns the project. This is only assigned when the user creates the project.
+        /// </summary>
+        Owner
 
     }
 }

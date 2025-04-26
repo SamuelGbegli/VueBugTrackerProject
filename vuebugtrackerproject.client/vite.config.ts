@@ -71,6 +71,9 @@ export default defineConfig({
       },'^/comments': {
         target,
         secure: false
+      },'^/userpermissions': {
+        target,
+        secure: false
       },
 
     },

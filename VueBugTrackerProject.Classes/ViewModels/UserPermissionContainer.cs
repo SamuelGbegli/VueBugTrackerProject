@@ -19,11 +19,11 @@ namespace VueBugTrackerProject.Classes
 		/// The current page of user permissions that are visible.
 		/// </summary>
 		public int CurrentPage { get; set; }
-	
+
 		/// <summary>
 		/// The current list of user permissions.
 		/// </summary>
-		public List<UserPermission> UserPermissions { get; set; }
+		public List<UserPermissionViewModel> UserPermissions { get; set; } = new List<UserPermissionViewModel>();
 	
 	}
 }

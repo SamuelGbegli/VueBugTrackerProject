@@ -53,6 +53,13 @@ namespace VueBugTrackerProject.Server.Controllers
                     Owner = account
                 };
 
+                //Adds user permission for project owner
+                project.UserPermissions.Add(new UserPermission
+                {
+                    Account = account,
+                    Permission = ProjectPermission.Owner
+                });
+
                 //Adds project to database
                 await _dbContext.Projects.AddAsync(project);
                 await _dbContext.SaveChangesAsync();

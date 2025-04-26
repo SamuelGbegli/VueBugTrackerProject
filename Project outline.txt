@@ -40,9 +40,9 @@ Project Requirements:
   Deleting bugs (done)
   Bug commenting and logging (done)
   Searching for projects (done)
+  Project settings (done)
 
   
-  Project settings (not done)
   Admin only user list page (not done)
   User profile (not done)
   User projects (not done)
@@ -50,8 +50,7 @@ Project Requirements:
   404 page (partially implemented)
 
 
-Next steps:
-  - project settings
+Next steps: add user profile
 
 Noted glitches:
 - If the user logs in, logs out and logs in again, the sidebar remains open
