@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Sodium;
 using System.Diagnostics;
 using VueBugTrackerProject.Classes;
+using VueBugTrackerProject.Classes.DTOs;
 
 namespace VueBugTrackerProject.Server.Controllers
 {
@@ -16,7 +17,9 @@ namespace VueBugTrackerProject.Server.Controllers
         private UserManager<Account> _userManager;
         private SignInManager<Account> _signInManager;
 
-        public AccountController(DatabaseContext context, UserManager<Account> userManager, SignInManager<Account> signInManager)
+        public AccountController(DatabaseContext context,
+            UserManager<Account> userManager,
+            SignInManager<Account> signInManager)
         {
             _context = context;
             _userManager = userManager;
@@ -45,6 +48,202 @@ namespace VueBugTrackerProject.Server.Controllers
         }
 
         /// <summary>
+        /// Gets a list of accounts in the application.
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("get")]
+        [Authorize(Roles = "Administrator, Super user")]
+        public async Task<IActionResult> GetUsers([FromQuery] int pageNumber)
+        {
+            try
+            {
+                //Gers all accounts
+                var accounts = await _context.Accounts
+                    .OrderBy(a => a.UserName)
+                    .ToListAsync();
+
+                //Creates a container to store account information
+                var accountContainer = new AccountContainer
+                {
+                    Pages = (int)Math.Ceiling(accounts.Count / (double)20),
+                    CurrentPage = pageNumber,
+                    TotalAccounts = accounts.Count
+                };
+
+                //Creates a view model for each account to be viewed
+                foreach (var account in accounts.Skip((pageNumber - 1) * 20).Take(20))
+                    accountContainer.Accounts.Add(new AccountViewModel(account));
+
+                return Ok(accountContainer);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Suspends or unsuspends a user's account.
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("suspend")]
+        [Authorize(Roles = "Administrator, Super user")]
+        public async Task<IActionResult> SuspendAccount([FromBody] string accountId)
+        {
+            try
+            {
+                //Looks for the account by ID
+                var account = await _context.Accounts
+                    .FirstOrDefaultAsync( a => a.Id == accountId);
+                if(account == null) return NotFound();
+
+                //Toggles the user's suspend status (e.g., suspends the
+                //account if it is not suspended)
+                account.Suspended = !account.Suspended;
+
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates a user's role.
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="newRole"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("updaterole")]
+        [Authorize(Roles = "Administrator, Super user")]
+        public async Task<IActionResult> UpdateAccountRole([FromBody] RoleDTO roleDTO)
+        {
+            try
+            {
+                //Looks for the account by ID
+                var account = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.Id == roleDTO.AccountID);
+                if (account == null) return NotFound();
+
+                //Removes account's existing role
+                var existingRoles = await _userManager.GetRolesAsync(account);
+                await _userManager.RemoveFromRolesAsync(account, existingRoles);
+                //Creates string based on role
+                string roleString = "";
+                switch (roleDTO.Role)
+                {
+                    case AccountRole.Normal:
+                        roleString = "Normal";
+                        break;
+                    case AccountRole.Admin:
+                        roleString = "Administrator";
+                        break;
+                    //Failsafe in case someone attempts to assign the super user role
+                    default:
+                        return BadRequest();
+                }
+
+                //Assigns new roles to account
+                await _userManager.AddToRoleAsync(account, roleString);
+                account.Role = roleDTO.Role;
+                
+                //Saves changes
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates an account's username.
+        /// </summary>
+        /// <param name="newUserName"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("updateusername")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUsername([FromBody] string newUserName)
+        {
+            try
+            {
+                //Gets user account
+                var account = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.Id == _userManager.GetUserId(User));
+
+                //Assigns new user naame and saves changes
+                account.UserName = newUserName;
+                await _context.SaveChangesAsync();
+                return NoContent();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates an account's email.
+        /// </summary>
+        /// <param name="newUserEmail"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("updateemail")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserEmail([FromBody] string newUserEmail)
+        {
+            try
+            {
+                //Gets user account
+                var account = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.Id == _userManager.GetUserId(User));
+
+                //Assigns new user email and saves changes
+                account.Email = newUserEmail;
+                await _context.SaveChangesAsync();
+                return NoContent();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates a user's password.
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <param name="oldPassword"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("updatepassword")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserPassword([FromBody] PasswordDTO passwordDTO)
+        {
+            try
+            {
+                var account = await _userManager.GetUserAsync(User);
+                await _userManager.ChangePasswordAsync(account, passwordDTO.OldPassword, passwordDTO.NewPassword);
+                return NoContent();
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Removes an account by an ID provided.
         /// </summary>
         /// <param name="accountId">The ID of the user to be deleted.</param>
@@ -62,13 +261,21 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (currentUser != accountId) return Unauthorized("Invalid delete request.");
 
                 var accountToRemove = await _context.Accounts.FindAsync(accountId);
+
                 if (accountToRemove != null)
-                {
+                {                    
+                    //Prevents super user account from being deleted
+                    if(accountToRemove.Role == AccountRole.SuperUser) return Forbid();
+
                     var userRoles = await _userManager.GetRolesAsync(accountToRemove);
 
+                    //Signs out user before deleting account
                     await _signInManager.SignOutAsync();
 
+                    //Removes account's role
                     await _userManager.RemoveFromRolesAsync(accountToRemove, userRoles);
+
+                    //Deletes the account
                     await _userManager.DeleteAsync(accountToRemove);
                     return NoContent();
                 }

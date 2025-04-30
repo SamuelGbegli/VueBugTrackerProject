@@ -34,17 +34,6 @@
         <QItem clickable>
           <QItemSection avatar>
             <QAvatar size="30px">
-    <!-- TODO: add avatar icon -->
-    <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-  </QAvatar>
-          </QItemSection>
-          <QItemSection>
-            {{ authStore.user.username }}
-          </QItemSection>
-        </QItem>
-        <QItem clickable>
-          <QItemSection avatar>
-            <QAvatar size="30px">
 
               <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
             </QAvatar>
@@ -75,7 +64,7 @@
             User settings
           </QItemSection>
         </QItem>
-        <QItem clickable>
+        <QItem v-if="authStore.getUserRole() != AccountRole.Normal" clickable href="/userlist">
           <QItemSection avatar>
             <QAvatar size="30px">
 
@@ -129,6 +118,7 @@ import { useRoute } from 'vue-router';
 import router from '@/router/router';
 
 import { useAuthStore } from '@/stores/AuthStore';
+import AccountRole from '@/enumConsts/Role';
 
 //Store for getting logged in user info
 const authStore = useAuthStore();
@@ -144,13 +134,14 @@ const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 }
 
-function logout(){
+async function logout(){
     //Shows loading screen
     Loading.show({
       message: "Logging out..."
     });
-  authStore.logout();
+  await authStore.logout();
   Loading.hide();
+  router.go(0);
 }
 
 //Function to open the login dialog

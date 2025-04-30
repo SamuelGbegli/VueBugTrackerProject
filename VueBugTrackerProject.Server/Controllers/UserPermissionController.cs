@@ -141,17 +141,10 @@ namespace VueBugTrackerProject.Server.Controllers
                 var account = await _userManager.GetUserAsync(User);
                 if (project.Owner != account) return Forbid();
 
-                //Looks for user
-                var userToAdd = await _databaseContext.Accounts.FirstOrDefaultAsync(u => u.Id == permissionDTO.AccountID);
-                if (userToAdd == null) return NotFound();
-
-                //Checks if user already has a permission for the project or owns the project
-                if (project.UserPermissions.Any(up => up.Account == account) || userToAdd == account) return BadRequest();
-
                 //Looks for permission
                 var permission = await _databaseContext.UserPermissions
                     .Include(up => up.Account)
-                    .FirstOrDefaultAsync(up => up.Account.Id == permissionDTO.AccountID);
+                    .FirstOrDefaultAsync(up => up.ID == permissionDTO.PermissionID);
                 if (permission == null) return NotFound();
 
                 //Applies changes
@@ -240,6 +233,42 @@ namespace VueBugTrackerProject.Server.Controllers
             catch(Exception ex)
             {
                 return StatusCode(500, "Cannot validate username. Please try again later.");
+            }
+        }
+
+        [HttpPost]
+        [Route("validate")]
+        [Authorize]
+        public async Task<IActionResult> ValidateUserPermission([FromBody] UserPermissionDTO permissionDTO)
+        {
+            try
+            {
+
+                //Gets user account
+                var account = await _userManager.GetUserAsync(User);
+
+                //Looks for project
+                var project = await _databaseContext.Projects
+                    .Include(p => p.Owner)
+                    .FirstOrDefaultAsync(p => p.ID == permissionDTO.ProjectID);
+                if (project == null) return NotFound();
+
+                //Gets account's user permission, if any
+                var userPermission = await _databaseContext.UserPermissions
+                    .Include(up => up.Account)
+                    .Include(up => up.Project)
+                    .FirstOrDefaultAsync(up => up.Account.Id == account.Id);
+
+                //Returns forbid if user is not project owner, they have no project permission or their permission does not match
+                if (account != project.Owner && (userPermission == null || userPermission.Permission != permissionDTO.Permission))
+                    return Forbid();
+
+                //Permission is valid
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }

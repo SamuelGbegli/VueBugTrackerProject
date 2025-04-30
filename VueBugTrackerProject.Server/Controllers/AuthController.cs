@@ -9,6 +9,7 @@ using Sodium;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using VueBugTrackerProject.Server.Services;
+using System.Security.Claims;
 
 namespace VueBugTrackerProject.Server.Controllers
 {
@@ -114,7 +115,7 @@ namespace VueBugTrackerProject.Server.Controllers
 
                     //TODO: return more detailed user information
                     //Returns account ID if username and password match
-                    return Ok(new { account.Id, username = account.UserName });
+                    return Ok(new { account.Id, username = account.UserName, role = account.Role });
                 }
 
                 Trace.WriteLine("Password does not match.");
@@ -270,6 +271,30 @@ namespace VueBugTrackerProject.Server.Controllers
                 return Ok("Email sent successfully");
             }
             catch (Exception ex) {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the logged in user's role.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("getrole")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRole()
+        {
+            try
+            {
+                //Returns the normal role if not logged in
+                if (!User.Identity.IsAuthenticated) return Ok(AccountRole.Normal);
+                
+                //Gets and returns role from logged in user
+                var account = await _userManager.GetUserAsync(User);
+                return Ok(account.Role);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, ex.Message);
             }
         }

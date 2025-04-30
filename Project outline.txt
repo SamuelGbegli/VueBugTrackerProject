@@ -41,16 +41,18 @@ Project Requirements:
   Bug commenting and logging (done)
   Searching for projects (done)
   Project settings (done)
+  404 page (done)
 
-  
+
   Admin only user list page (not done)
   User profile (not done)
   User projects (not done)
   User settings (not done)
-  404 page (partially implemented)
 
 
-Next steps: add user profile
+Next steps: add user profile page
+- create user template
+
 
 Noted glitches:
 - If the user logs in, logs out and logs in again, the sidebar remains open

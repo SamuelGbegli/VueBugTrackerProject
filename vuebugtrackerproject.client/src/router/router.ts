@@ -7,7 +7,9 @@ import BugSettingsPage from "@/pages/bugs/BugSettingsPage.vue";
 import ViewBugPage from "@/pages/bugs/ViewBugPage.vue";
 import CreditsPage from "@/pages/CreditsPage.vue";
 import MainPage from "@/pages/MainPage.vue";
+import NotFoundPage from "@/pages/other/NotFoundPage.vue";
 import Sandbox from "@/pages/other/sandbox.vue";
+import UserListPage from "@/pages/other/UserListPage.vue";
 import AddBugPage from "@/pages/projects/AddBugPage.vue";
 import CreateProjectPage from "@/pages/projects/CreateProjectPage.vue";
 import ProjectBugsPage from "@/pages/projects/ProjectBugsPage.vue";
@@ -19,6 +21,9 @@ import MainTemplate from "@/templates/MainTemplate.vue";
 import ProjectTemplate from "@/templates/ProjectTemplate.vue";
 
 import { createRouter, createWebHistory } from "vue-router"
+
+import { useAuthStore } from "@/stores/AuthStore";
+import AccountRole from "@/enumConsts/Role";
 
 const router = createRouter({
  history: createWebHistory(),
@@ -58,6 +63,10 @@ const router = createRouter({
       {
         path: "createproject",
         component: CreateProjectPage
+      },
+      {
+        path: "userlist",
+        component: UserListPage
       },
       {
         path: "credits",
@@ -106,6 +115,10 @@ const router = createRouter({
             component: BugDiscussionPage
           }
         ]
+      },
+      {
+        path: "/:pathMatch(.*)*",
+        component: NotFoundPage
       }
     ]
   }

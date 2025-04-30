@@ -29,12 +29,11 @@
           <!--Section to edit user permissions-->
           <QTabPanel name="Permissions">
             <div class="row">
-              <!--TODO: add function to add user permission-->
               <QSpace/>
               <QBtn @click="openDialog()" label="Add user"/>
             </div>
             <br/>
-            <div>
+            <div v-if="userPermissions.totalPermissions > 0">
               <QMarkupTable>
               <thead>
                 <tr>
@@ -44,7 +43,6 @@
                 </tr>
               </thead>
               <tbody>
-                <!--TODO: add rows for user permisions-->
                 <tr v-for="x in userPermissions.userPermissions">
                   <td>
                     <UserIcon :username="(x as UserPermissionViewModel).accountName" />
@@ -83,13 +81,13 @@
             </QMarkupTable>
             <div class="row">
               <QSpace/>
-              <!--TODO: add pagination control-->
               <QPagination :min="1" :max="userPermissions.pages"
               v-model="pageNumber"
               @update:model-value="loadUserPermissions"
               input/>
             </div>
             </div>
+            <h5 v-else>There are no user permissions.</h5>
           </QTabPanel>
           <!--Section to delete project-->
           <QTabPanel name="Other">

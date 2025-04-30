@@ -3,15 +3,15 @@ import AccountRole from "@/enumConsts/Role";
 export default class AccountViewModel{
 
 	// Unique identifier for the account.
-	ID: string = "";
+	id: string = "";
 	// The account's username.
-	Username: string = "";
+	username: string = "";
 	// The icon that will be shown with the account's username.
-	Icon: string = "";
+	icon: string = "";
 	// The role and privileges the account has in the application.
-	Role: number = AccountRole.Normal;
+	role: number = AccountRole.Normal;
 	// If true, the user cannot login with the account.
-	Suspended: boolean = false;
+	suspended: boolean = false;
 	// The date and time the account was created.
-	DateCreated: Date = new Date();
+	dateCreated: Date = new Date();
 }

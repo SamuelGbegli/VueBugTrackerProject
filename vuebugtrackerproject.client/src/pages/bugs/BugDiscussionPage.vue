@@ -2,7 +2,7 @@
   <div class="row">
     <h6>Total comments: {{ commentContainer.totalComments }}</h6>
     <QSpace/>
-    <QBtn @click="showCommentDialog()" v-if="authStore.getUserID()" label="Add comment"/>
+    <QBtn @click="showCommentDialog()" label="Add comment"/>
   </div>
   <br/>
   <div v-if="commentContainer.totalComments > 0">
@@ -41,6 +41,7 @@
   import { Dialog, Loading, Notify } from 'quasar';
   import CommentDialog from '@/dialogs/CommentDialog.vue';
   import ConfirmationDialog from '@/dialogs/ConfirmationDialog.vue';
+import BugViewModel from '@/viewmodels/BugViewModel';
 
   //The page of comments the user is on
   const currentPage = ref(1);
@@ -61,7 +62,7 @@
     }
   });
 
-  //Loads comments from frontend
+  //Loads comments from server
   async function getComments() {
     try {
       const response = await axios.get(`/comments/get/${route.params.bugId}/${currentPage.value}`);
@@ -109,7 +110,7 @@
       componentProps:{
         requiresConfirmation: false,
         header: "Delete comment",
-        message: "Comments cannont be recovered once deleted. Are you sure you want to continue?"
+        message: "Comments cannot be recovered once deleted. Are you sure you want to continue?"
       }
     }).onOk(async () =>{
       try{

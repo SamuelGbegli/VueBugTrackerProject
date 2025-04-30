@@ -30,7 +30,6 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <param name="projectId"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        //TODO: Change to POST with bug filtering
         [HttpGet]
         [Route("getbugpreviews")]
         [AllowAnonymous]
@@ -324,9 +323,18 @@ namespace VueBugTrackerProject.Server.Controllers
                     .FirstOrDefaultAsync(p => p.ID == bugDTO.ProjectID);
                 if (project == null) return NotFound();
 
-                //Checks if user owns the project
+                //Checks if user owns the project or has editing privilages
                 //TODO: add checking for user permissions
-                if (project.Owner != account) return Forbid();
+
+                //Gets account's user permission, if any
+                var userPermission = await _databaseContext.UserPermissions
+                    .Include(up => up.Account)
+                    .Include(up => up.Project)
+                    .FirstOrDefaultAsync(up => up.Account.Id == account.Id);
+
+                //Ensures user either owns the project or has the editor role in the project
+                if (account != project.Owner && (userPermission == null || userPermission.Permission != ProjectPermission.Editor))
+                    return Forbid();
 
                 //Creates and adds bug
                 var bug = new Bug

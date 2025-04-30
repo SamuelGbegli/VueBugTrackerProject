@@ -30,7 +30,6 @@ const nonLoggedInOnlyPages = ["/register", "/recoveraccount", "/resetpassword"];
 
 router.beforeEach(async (to) =>{
 
-
 //Checks if the user is still logged in every time the page changes
   const authStore = useAuthStore();
   authStore.isLoggedInBackend();

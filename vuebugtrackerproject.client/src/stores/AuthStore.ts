@@ -1,12 +1,11 @@
 //Store for managing a user login to the app
 
 import type UserDTO from "@/classes/DTOs/UserDTO";
+import AccountRole from "@/enumConsts/Role";
 
 import axios, { AxiosError } from "axios";
 import { defineStore } from "pinia";
 import { useRouter } from "vue-router";
-
-const router = useRouter();
 
 export const useAuthStore = defineStore("auth", {
   //User value is user item fetched from localStorage
@@ -88,10 +87,9 @@ export const useAuthStore = defineStore("auth", {
       catch (ex){
         //If the frontend cannot connect to the server, ensures that the user store is empty
 
-
-        this.user = null;
-        localStorage.removeItem("user");
-        return false;
+        // this.user = null;
+        // localStorage.removeItem("user");
+        // return false;
       }
     },
 
@@ -99,18 +97,36 @@ export const useAuthStore = defineStore("auth", {
     async logout(){
 
       //Removes user values from stores
-      console.log("logging out...");
       const response = await axios.post("/auth/logout", {});
       this.user = null;
       localStorage.removeItem("user");
-
-      //Reloads page when logged in
-      router.go(0);
     },
     //Gets the id of the user logged in
     getUserID(){
       if(!!this.user) return this.user.id;
       return "";
+    },
+    //Gets the role of the logged in user
+    getUserRole() {
+      console.log(!!this.user? this.user.role : AccountRole.Normal);
+      if(!!this.user) return this.user.role;
+      return AccountRole.Normal;
+    },
+    //TODO: change to get role for individual projects
+    //Checks if the user has the correct permissions in a project
+    async isUserValidated(projectId: string, role: number) {
+      try{
+        const response = await axios.post("userpermissions/validate", {
+          projectId: projectId,
+          permission: role,
+        })
+
+        return true;
+      }
+      //Cannot connect to server, or user is not authorised
+      catch(ex){
+        return false
+      }
     }
   }
 })
