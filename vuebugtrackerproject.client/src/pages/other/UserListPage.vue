@@ -22,9 +22,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="x in accountContainer.accounts" :class="x.suspended ? 'bg-red' : ''">
+          <tr v-for="x in accountContainer.accounts" :class="x.suspended ? 'bg-red' : ''" v-bind:key="(x as AccountViewModel).id">
             <td>
-              <UserIcon :username="(x as AccountViewModel).username"/>
+              <UserIcon :username="(x as AccountViewModel).username" :icon="(x as AccountViewModel).icon"/>
             </td>
             <td>{{ formatDate((x as AccountViewModel).dateCreated) }}</td>
             <td>
@@ -106,7 +106,7 @@ import ErrorPromptType from '@/enumConsts/ErrorPromptType';
   import { onBeforeMount, ref } from 'vue';
 
   //The number of pages of accounts, in groups of up to 20
-  const numberOfPages = ref(1);
+  //const numberOfPages = ref(1);
 
   //The current page the user is on
   const currentPage = ref(1);
@@ -142,7 +142,7 @@ import ErrorPromptType from '@/enumConsts/ErrorPromptType';
       const response = await axios.get(`/accounts/get?pageNumber=${currentPage.value}`);
       console.log(response);
       accountContainer.value = Object.assign(new AccountContainer(), response.data);
-    } catch (ex) {
+    } catch {
 
     }
     loading.value = false;
@@ -196,7 +196,7 @@ import ErrorPromptType from '@/enumConsts/ErrorPromptType';
         message: "Please wait..."
       });
 
-    let roleDTO = new RoleDTO();
+    const roleDTO = new RoleDTO();
     roleDTO.accountID = selectedAccount.value.id;
     roleDTO.role = accountRoleOptions.indexOf(selectedAccountRole.value);
 
@@ -209,7 +209,7 @@ import ErrorPromptType from '@/enumConsts/ErrorPromptType';
           position: "bottom",
           type: "positive"
         });
-    } catch (ex) {
+    } catch {
       Notify.create({
           message: "Something went wrong when processing your request. Please try again later.",
           position: "bottom",

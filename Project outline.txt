@@ -26,17 +26,17 @@ Future plans
 show error message when user goes to project they cannot see
 
 Project Requirements:
-  Landing page (done, except for link touser projects page)
+  Landing page (done)
   Browse page (done)
   Logging in, Registration and account recovery (all done)
-  navbar (mostly done)
+  navbar (done)
   Creating new projects (done)
   Viewing projects (done)
-  Deleting projects (not done)
+  Deleting projects (done)
   Viewing project bugs (done)
   Adding bugs (done)
   Editing bugs (done)
-  Viewing bugs (add bug filtering)
+  Viewing bugs (done)
   Deleting bugs (done)
   Bug commenting and logging (done)
   Searching for projects (done)
@@ -44,7 +44,7 @@ Project Requirements:
   404 page (done)
 
 
-  Admin only user list page (not done)
+  Admin only user list page (mostly done)
   User profile (not done)
   User projects (not done)
   User settings (not done)

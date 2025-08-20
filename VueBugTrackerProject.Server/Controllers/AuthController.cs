@@ -115,7 +115,7 @@ namespace VueBugTrackerProject.Server.Controllers
 
                     //TODO: return more detailed user information
                     //Returns account ID if username and password match
-                    return Ok(new { account.Id, username = account.UserName, role = account.Role });
+                    return Ok(new { account.Id, username = account.UserName, role = account.Role, account.Icon });
                 }
 
                 Trace.WriteLine("Password does not match.");

@@ -2,16 +2,16 @@
   <div class="row">
     <QSpace/>
     <!--Shows when the comment was posted. If the user edited it "(Edited)" is also shown-->
-    <h6>{{ comment?.edited? `${formatDate(comment.datePosted)} (Edited)` : `${formatDate(comment.datePosted)}` }}</h6>
+    <h6>{{ comment?.edited? `${formatDate(comment.datePosted)} (Edited)` : comment? `${formatDate(comment.datePosted)}` : ""}}</h6>
   </div>
   <QCard>
     <QCardSection>
     <!--Shows username and icon of comment poster-->
-      <UserIcon :username="props.comment?.ownerName"/>
+      <UserIcon :username="props.comment?.ownerName" :icon="props.comment?.ownerIcon"/>
       <!--Shows a preview of the comment being replied to-->
       <QCard v-if="!!props.comment?.replyCommentID">
         <QCardSection>
-          <UserIcon :username="props.comment.replyCommentOwnerName"/>
+          <UserIcon :username="props.comment.replyCommentOwnerName" :icon="props.comment?.replyCommentOwnerIcon"/>
           <p>{{ props.comment.replyCommentText }}</p>
         </QCardSection>
       </QCard>

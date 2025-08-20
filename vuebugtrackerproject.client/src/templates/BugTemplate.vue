@@ -1,6 +1,7 @@
 <template>
   <div v-if="statusCode === 200">
-    <QBanner>
+    <div class="q-gutter-md">
+      <QBanner>
     <div class="row">
         <h3>{{ bug.projectName }}/Bugs</h3>
         <QSpace/>
@@ -16,6 +17,7 @@
       <QRouteTab v-if="authStore.getUserID() === bug.creatorID || authStore.getUserID() === bug.projectOwnerID " label="Settings" :to="`/bug/${bug.id}/settings`"/>
     </QTabs>
     <router-view />
+    </div>
   </div>
   <div v-if="(statusCode && statusCode != 200)">
     <ErrorBanner :message="errorMessage" :prompt-type="errorPromptType"/>
@@ -26,7 +28,6 @@ import axios, { AxiosError } from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
-import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 import BugViewModel from '@/viewmodels/BugViewModel';
@@ -34,8 +35,8 @@ import formatDate from '@/classes/helpers/FormatDate';
 
 const authStore = useAuthStore();
 
+//Stores bugs
 const bug = ref(new BugViewModel());
-
 
 const statusCode = ref();
 const errorMessage = ref("");
@@ -58,7 +59,7 @@ onMounted(async ()=>{
   }
   catch(ex){
     //Error handling if project could not be fetched
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     //Updates status code to show error banner
     statusCode.value = error.status;
     console.log(error);

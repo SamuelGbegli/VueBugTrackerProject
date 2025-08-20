@@ -33,61 +33,70 @@
               <QBtn @click="openDialog()" label="Add user"/>
             </div>
             <br/>
-            <div v-if="userPermissions.totalPermissions > 0">
-              <QMarkupTable>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="x in userPermissions.userPermissions">
-                  <td>
-                    <UserIcon :username="(x as UserPermissionViewModel).accountName" />
-                  </td>
-                  <td>
-                    {{
-                      (x as UserPermissionViewModel).permission === ProjectPermission.Owner?
-                      "Owner" :
-                      (x as UserPermissionViewModel).permission === ProjectPermission.Editor?
-                      "Editor" :
-                      "Viewer"
-                     }}
-                  </td>
-                  <td>
-                  <!--TODO: Add actions for non-project owners-->
-                  <div v-if="project.ownerID != (x as UserPermissionViewModel).accountID">
-                    <QBtnDropdown v-if="project.visibility === Visibility.Restricted" label="Actions">
-                    <QList>
-                      <QItem clickable v-close-popup @click="openDialog(x)">
-                        <QItemSection>
-                          <QItemLabel>Edit</QItemLabel>
-                        </QItemSection>
-                      </QItem>
-                      <QItem clickable v-close-popup @click="deleteUserPermission(x)">
-                        <QItemSection>
-                          <QItemLabel>Delete</QItemLabel>
-                        </QItemSection>
-                      </QItem>
-                    </QList>
-                    </QBtnDropdown>
-                    <QBtn v-else @click="deleteUserPermission(x as UserPermissionViewModel)" label="Delete"/>
-                  </div>
-                  </td>
-                </tr>
-              </tbody>
-            </QMarkupTable>
-            <div class="row">
-              <QSpace/>
-              <QPagination :min="1" :max="userPermissions.pages"
-              v-model="pageNumber"
-              @update:model-value="loadUserPermissions"
-              input/>
+            <div v-if="!userPermissionStatusCode || userPermissionStatusCode == 200">
+              <div v-if="userPermissions.totalPermissions > 0">
+                <QMarkupTable>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="x in userPermissions.userPermissions" v-bind:key="(x as UserPermissionViewModel).id">
+                    <td>
+                      <UserIcon :username="(x as UserPermissionViewModel).accountName" :icon="(x as UserPermissionViewModel).accountIcon"/>
+                    </td>
+                    <td>
+                      {{
+                        (x as UserPermissionViewModel).permission === ProjectPermission.Owner?
+                        "Owner" :
+                        (x as UserPermissionViewModel).permission === ProjectPermission.Editor?
+                        "Editor" :
+                        "Viewer"
+                      }}
+                    </td>
+                    <td>
+                    <!--TODO: Add actions for non-project owners-->
+                    <div v-if="project.ownerID != (x as UserPermissionViewModel).accountID">
+                      <QBtnDropdown v-if="project.visibility === Visibility.Restricted" label="Actions">
+                      <QList>
+                        <QItem clickable v-close-popup @click="openDialog(x)">
+                          <QItemSection>
+                            <QItemLabel>Edit</QItemLabel>
+                          </QItemSection>
+                        </QItem>
+                        <QItem clickable v-close-popup @click="deleteUserPermission(x)">
+                          <QItemSection>
+                            <QItemLabel>Delete</QItemLabel>
+                          </QItemSection>
+                        </QItem>
+                      </QList>
+                      </QBtnDropdown>
+                      <QBtn v-else @click="deleteUserPermission(x as UserPermissionViewModel)" label="Delete"/>
+                    </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </QMarkupTable>
+              <div class="row">
+                <QSpace/>
+                <QPagination :min="1" :max="userPermissions.pages"
+                v-model="pageNumber"
+                @update:model-value="loadUserPermissions"
+                input/>
+              </div>
+              </div>
+              <h5 v-else>There are no user permissions.</h5>
+              <QInnerLoading :showing="!userPermissionStatusCode"
+              label="Loading..."
+              style="height: 100%;"/>
             </div>
+            <div v-else>
+              <h5>Failed to load data.</h5>
+              <QBtn @click="loadUserPermissions()" label="Reload"/>
             </div>
-            <h5 v-else>There are no user permissions.</h5>
           </QTabPanel>
           <!--Section to delete project-->
           <QTabPanel name="Other">
@@ -157,14 +166,19 @@ import { Dialog, Loading, Notify } from 'quasar';
 import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+  //Stores project to be viewed
   const project = ref(new ProjectViewModel());
+  //Stores status code when fetching project from backend
   const statusCode = ref();
   const route = useRoute();
   const router = useRouter();
+  //Name of current tab in settings pate
   const currentTab = ref("Edit project");
 
   //Stores user permissions
   const userPermissions = ref(new UserPermissionContainer());
+  //Stores user permission status code
+  const userPermissionStatusCode = ref();
   //Stores user permission table page number
   const pageNumber = ref(1);
   //If true, shows dialog to add or edit a user permission
@@ -173,6 +187,7 @@ import { useRoute, useRouter } from 'vue-router';
   const selectedPermission = ref();
   //The roles that can be assigned to a user
   const permissionRoles = ["Viewer", "Editor"];
+
 
   //Stores values in the permission form
   const permissionFormValues = ref({
@@ -189,7 +204,7 @@ import { useRoute, useRouter } from 'vue-router';
         project.value = Object.assign(new ProjectViewModel(), response.data);
       }
       catch (ex){
-        let error = ex as AxiosError;
+        const error = ex as AxiosError;
         statusCode.value = error.status;
       }
 
@@ -200,18 +215,24 @@ import { useRoute, useRouter } from 'vue-router';
   //Gets project user permissions from the backend
   async function loadUserPermissions() {
     try{
+      userPermissionStatusCode.value = null;
+      //Gets response from backend
       const response = await axios.get(`/userpermissions/get?projectID=${route.params.projectId}&pageNumber=${pageNumber.value}`)
+      //Assigns data from the backend to an object
       userPermissions.value = Object.assign(new UserPermissionContainer, response.data);
-      console.log(JSON.stringify(userPermissions.value));
-      console.log(`/userpermissions/get?projectID=${route.params.projectId}&pageNumber=${pageNumber.value}`);
+      //Stores status code
+      userPermissionStatusCode.value = response.status
     }
     catch (ex){
-      //TODO: add error functioning data fails to load
+      //Something went wrong, saves error code
+      const error = ex as AxiosError;
+      userPermissionStatusCode.value = error.status;
     }
   }
 
   //Prepares and opens the user permissions dialog
   function openDialog(userPermission: UserPermissionViewModel | null = null){
+    //Section for editing an existing permission
     if(!!userPermission) {
       selectedPermission.value = userPermission;
       permissionFormValues.value = ({
@@ -219,6 +240,7 @@ import { useRoute, useRouter } from 'vue-router';
         role: permissionRoles[userPermission.permission]
       });
     }
+    //Section for adding a new permission
     else {
       selectedPermission.value = null;
       permissionFormValues.value = ({
@@ -236,15 +258,13 @@ import { useRoute, useRouter } from 'vue-router';
 
     try{
       //Checks if an account exists with the name given
-      var response = await axios.get(`/userpermissions/isnamevalid?username=${input}&projectId=${project.value.id}`);
+      await axios.get(`/userpermissions/isnamevalid?username=${input}&projectId=${project.value.id}`);
       //If response is OK, user exists and can have a permission added
       return true;
     }
-    catch (ex){
-      //Shows error message if an error happens
-      let error = ex as AxiosError;
-      console.log(error);
-      return error.response?.data;
+    catch {
+      //Server does not return valid response and error is shown
+      return "Cannot reach server.";
     }
 
   }
@@ -252,7 +272,7 @@ import { useRoute, useRouter } from 'vue-router';
   //Submits user permission
   async function submitForm() {
     try {
-      let permissionDTO = new UserPermissionDTO();
+      const permissionDTO = new UserPermissionDTO();
 
       permissionDTO.projectID = project.value.id;
       //NB: Uses username instead of ID since all usernames must be unique
@@ -282,14 +302,17 @@ import { useRoute, useRouter } from 'vue-router';
       //Reloads user permissions
       //TODO: add function to change page if adding permission
       await loadUserPermissions();
+      pageNumber.value = 1;
 
-      //Show notification
+      //Show notification if successful
       Notify.create({
         message: !!selectedPermission.value ? "Successfully modified permission." : "Successfully added permission.",
         position: "bottom",
         type: "positive"
       });
-    } catch {
+    }
+    //Something went wrong, shows error
+    catch {
       Notify.create({
       message: "Something went wrong when processing your request. Please try again later.",
       position: "bottom",
@@ -321,7 +344,7 @@ import { useRoute, useRouter } from 'vue-router';
         //Reloads user permissions, going back to page 1
         pageNumber.value = 1;
         await loadUserPermissions();
-        //Show notification
+        //Show notification when successful
       Notify.create({
         message: "Successfully deleted permission.",
         position: "bottom",
@@ -356,7 +379,7 @@ import { useRoute, useRouter } from 'vue-router';
       });
 
       try{
-        const response = await axios.delete("/projects/delete", {
+        await axios.delete("/projects/delete", {
         headers:{
           "Content-Type": "application/json"
         },
@@ -366,6 +389,7 @@ import { useRoute, useRouter } from 'vue-router';
       router.push(`/browse`);
       }
       catch{
+        //Something went wrong, error is shown
         Notify.create({
           message: "Could not process request. Please try again later.",
           position: "bottom",
@@ -373,7 +397,7 @@ import { useRoute, useRouter } from 'vue-router';
         });
       }
       finally{
-        Loading.hide;
+        Loading.hide();
       }
     });
     }

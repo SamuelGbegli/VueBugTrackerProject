@@ -24,6 +24,7 @@ import { createRouter, createWebHistory } from "vue-router"
 
 import { useAuthStore } from "@/stores/AuthStore";
 import AccountRole from "@/enumConsts/Role";
+import UserSettingsPage from "@/pages/other/UserSettingsPage.vue";
 
 const router = createRouter({
  history: createWebHistory(),
@@ -75,6 +76,10 @@ const router = createRouter({
       {
         path: "sandbox",
         component: Sandbox
+      },
+      {
+        path: "settings",
+        component: UserSettingsPage
       },
       {
         path: "project",

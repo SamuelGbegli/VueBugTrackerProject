@@ -68,7 +68,7 @@ async function onSubmit(){
 });
 
   //Creates DTO to send username and email address
-  let userDTO = new UserDTO();
+  const userDTO = new UserDTO();
   userDTO.Username = username.value;
   userDTO.Emailaddress = email.value;
 
@@ -84,7 +84,7 @@ console.log(response);
   //Shows an error message when the server cannot process the request
   catch (ex){
 
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
 
     if(error.status === 500){
       Notify.create({

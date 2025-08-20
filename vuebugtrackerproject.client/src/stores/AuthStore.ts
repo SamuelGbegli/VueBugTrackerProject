@@ -97,7 +97,7 @@ export const useAuthStore = defineStore("auth", {
     async logout(){
 
       //Removes user values from stores
-      const response = await axios.post("/auth/logout", {});
+      //const response = await axios.post("/auth/logout", {});
       this.user = null;
       localStorage.removeItem("user");
     },
@@ -127,6 +127,10 @@ export const useAuthStore = defineStore("auth", {
       catch(ex){
         return false
       }
+    },
+    //Updates the account's visible name when it is updated
+    updateUsername(newUsername: string){
+      console.log(this.user);
     }
   }
 })

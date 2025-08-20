@@ -8,13 +8,13 @@
   </div>
   <!--Visible when projects are found or being loaded-->
   <div v-if="!statusCode || statusCode === 200">
-  <div>
+  <div v-if="!!statusCode">
     <span>Total projects: {{ projects.totalProjects }}</span>
   </div>
-    <div v-if="projects.totalProjects > 0" >
+    <div v-if="projects.totalProjects > 0">
       <!--Shows list of projects if any were found-->
       <div class="row q-gutter-md">
-      <ProjectPreview v-for="x in projects.projects" :-project="x"/>
+      <ProjectPreview v-for="x in projects.projects" :-project="x" v-bind:key="(x as ProjectPreviewViewModel).id"/>
     </div>
     <div class="row">
         <QSpace/>
@@ -26,11 +26,12 @@
       </div>
     </div>
     <!--Visible if there are no projects found-->
-    <div v-else>
+    <div v-else-if="!!statusCode">
         <h6>No projects were found.</h6>
       </div>
       <QInnerLoading
-        :showing="!statusCode"/>
+        :showing="!statusCode"
+        style="width: 100%; height: 100%"/>
     </div>
     <!--Visible if the client does not get a response from the server
       or somehow goes to a page greater than the filter's maximum-->
@@ -82,10 +83,9 @@ import ProjectType from '@/enumConsts/ProjectType';
 import SortOrder from '@/enumConsts/SortOrder';
 import SortType from '@/enumConsts/SortType';
 import ProjectContainer from '@/viewmodels/ProjectContainer'
-import ProjectViewModel from '@/viewmodels/ProjectViewModel';
+import type ProjectPreviewViewModel from '@/viewmodels/ProjectPreviewViewModel';
 import axios, { AxiosError } from 'axios';
 import { onBeforeMount, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 
 //Projects visible by the user
 const projects = ref(new ProjectContainer());
@@ -104,9 +104,6 @@ const filterDTO = ref(new FilterDTO());
 
 //Shows the dialog to change the filter
 const showFilterDialog = ref(false);
-
-const route = useRoute();
-const router = useRouter();
 
 //Values for project type dropdown
 const projectTypeValues = ["All projects", "Projects with no open bugs", "Projects with open bugs"];
@@ -160,7 +157,7 @@ async function getProjects() {
   }
   catch(ex){
     //Sets status code error
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     statusCode.value = error.status;
   }
 }

@@ -1,12 +1,14 @@
 <template>
+  <br/>
+  <div class="q-gutter-md">
   <div class="row">
     <h6>Total comments: {{ commentContainer.totalComments }}</h6>
     <QSpace/>
     <QBtn @click="showCommentDialog()" label="Add comment"/>
   </div>
   <br/>
-  <div v-if="commentContainer.totalComments > 0">
-    <div v-for="x in commentContainer.comments">
+  <div v-if="!commentStatusCode || commentStatusCode == 200">
+    <div v-for="x in commentContainer.comments" v-bind:key="(x as CommentViewModel).id">
       <CommentPreview :comment="(x as CommentViewModel)" />
       <div class="row" v-if="!x.isStatusUpdate">
         <QSpace/>
@@ -25,23 +27,28 @@
                    input />
     </div>
       <QInnerLoading
-        :showing="!commentContainer.comments"/>
+        :showing="!commentStatusCode"
+        style="height: 100%;"
+        label="Loading..."/>
 
+  </div>
+  <div v-else>
+    <h5>Failed to load data.</h5>
+    <QBtn @click="getComments()" label="Reload"/>
+  </div>
   </div>
 </template>
 <script setup lang="ts">
   import CommentPreview from '@/components/CommentPreview.vue';
   import CommentContainer from '@/viewmodels/CommentContainer';
   import CommentViewModel from '@/viewmodels/CommentViewModel';
-  import axios from 'axios';
+  import axios, { AxiosError } from 'axios';
   import { ref, onBeforeMount } from 'vue';
   import { useRoute } from 'vue-router';
   import { useAuthStore } from '@/stores/AuthStore';
-  import CommentDTO from '@/classes/DTOs/CommentDTO';
-  import { Dialog, Loading, Notify } from 'quasar';
+  import { Dialog, Notify } from 'quasar';
   import CommentDialog from '@/dialogs/CommentDialog.vue';
   import ConfirmationDialog from '@/dialogs/ConfirmationDialog.vue';
-import BugViewModel from '@/viewmodels/BugViewModel';
 
   //The page of comments the user is on
   const currentPage = ref(1);
@@ -51,6 +58,9 @@ import BugViewModel from '@/viewmodels/BugViewModel';
 
   //Stores the number of comments, and the current page and comments visible
   const commentContainer = ref(new CommentContainer());
+
+  //Stores the status code when fetching comments
+  const commentStatusCode = ref();
 
   const route = useRoute();
   const authStore = useAuthStore();
@@ -64,6 +74,7 @@ import BugViewModel from '@/viewmodels/BugViewModel';
 
   //Loads comments from server
   async function getComments() {
+    commentStatusCode.value = null;
     try {
       const response = await axios.get(`/comments/get/${route.params.bugId}/${currentPage.value}`);
       commentContainer.value = Object.assign(new CommentContainer, response.data);
@@ -72,8 +83,13 @@ import BugViewModel from '@/viewmodels/BugViewModel';
       //Ensures comment page goes back if the last comment in a page is removed
       if(currentPage.value > numberOfPages.value)
         currentPage.value = numberOfPages.value;
-    } catch {
+
+      commentStatusCode.value = response.status
+    } catch(ex) {
       //TODO: add error handling for when comment fetching fails
+      //Frontend failed to fetch comments, shows error message
+      const error = ex as AxiosError
+      commentStatusCode.value = error.status
     }
   };
 

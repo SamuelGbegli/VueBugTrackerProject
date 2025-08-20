@@ -19,21 +19,25 @@
       <br/>
       <QCard style="width: auto;">
         <QCardSection>
-          <div class="q-pa-md row items-start q-gutter-md">
-            <ProjectPreview v-if="userProjectsStatusCode === 200" v-for="x in recentUserProjects" :-project="(x as ProjectPreviewViewModel)"/>
+          <div>
+            <div class="q-pa-md row items-start q-gutter-md" v-if="userProjectsStatusCode === 200">
+              <ProjectPreview v-for="x in recentUserProjects" :-project="(x as ProjectPreviewViewModel)" v-bind:key="(x as ProjectPreviewViewModel).id"/>
+            </div>
             <QBanner v-else-if="userProjectsStatusCode === 500">Cannot fetch projects.</QBanner>
-            <QCard v-else v-for="x in 5" style="width: 200px;">
-              <QSkeleton square height="200px"/>
+            <div class="q-pa-md row items-start q-gutter-md" v-else>
+              <QCard v-for="x in 5" style="width: 320px;" v-bind:key="x">
+              <QSkeleton square height="320px"/>
               <QCardActions align="right">
                 <QSkeleton type="QBtn"/>
               </QCardActions>
             </QCard>
+            </div>
           </div>
         </QCardSection>
-        <!--TODO: link to user's projects page-->
-        <QCardActions align="right">
+        <!--Would have added link to user project page-->
+        <!-- <QCardActions align="right">
           <QBtn label="View more"/>
-        </QCardActions>
+        </QCardActions> -->
       </QCard>
     </div>
 <br/>
@@ -44,15 +48,20 @@
       <br/>
       <QCard style="width: auto;">
         <QCardSection>
-          <div class="q-pa-md row items-start q-gutter-md">
-            <ProjectPreview v-if="projectsStatusCode === 200" v-for="x in recentProjects" :-project="x"/>
+          <div>
+          <div class="q-pa-md row items-start q-gutter-md" v-if="projectsStatusCode === 200">
+            <ProjectPreview v-for="x in recentProjects" :-project="x" v-bind:key="(x as ProjectPreviewViewModel).id"/>
+          </div>
+
             <QBanner v-else-if="projectsStatusCode === 500">Cannot fetch projects.</QBanner>
-            <QCard v-else v-for="x in 5" style="width: 200px;">
-              <QSkeleton square height="200px"/>
+            <div class="q-pa-md row items-start q-gutter-md" v-else>
+              <QCard v-for="x in 5" style="width: 320px;" v-bind:key="x">
+              <QSkeleton square height="320px"/>
               <QCardActions align="right">
                 <QSkeleton type="QBtn"/>
               </QCardActions>
             </QCard>
+            </div>
           </div>
         </QCardSection>
         <QCardActions align="right">
@@ -87,7 +96,7 @@ const projectsStatusCode = ref();
 //Stores the status code returned when fetching user projects
 const userProjectsStatusCode = ref();
 
-onMounted(async () =>{
+onMounted(async () => {
   await getRecentProjects();
   if (authStore.isLoggedIn()) await getRecentUserProjects();
 });
@@ -98,7 +107,7 @@ async function getRecentProjects(){
   try{
     const response = await axios.get("/projects/getrecentprojects");
 
-    let projects :ProjectPreviewViewModel[] = [];
+    const projects :ProjectPreviewViewModel[] = [];
 
   for(let i = 0; i < response.data.length; i++){
     projects.push(Object.assign(new ProjectPreviewViewModel, response.data[i]));
@@ -108,7 +117,7 @@ async function getRecentProjects(){
     projectsStatusCode.value = response.status;
   }
     catch (ex){
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     projectsStatusCode.value = error.status;
     console.log(error);
   }
@@ -120,7 +129,7 @@ async function getRecentUserProjects(){
   try{
     const response = await axios.get("/projects/getrecentprojects?getUserProjects=true");
 
-    let projects :ProjectPreviewViewModel[] = [];
+    const projects :ProjectPreviewViewModel[] = [];
 
     for(let i = 0; i < response.data.length; i++){
       projects.push(Object.assign(new ProjectPreviewViewModel, response.data[i]));
@@ -131,7 +140,7 @@ async function getRecentUserProjects(){
     userProjectsStatusCode.value = response.status;
   }
   catch (ex){
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     userProjectsStatusCode.value = error.status;
     console.log(error);
   }

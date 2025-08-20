@@ -13,7 +13,9 @@
 </QBanner>
 <br/>
 <QCard>
+
   <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+    <QCardSection>
   <QInput label="Password"
           stack-label
           type="password"
@@ -24,10 +26,11 @@
           type="password"
           v-model="passwordConfirm"
           :rules="[val => isFieldEmpty(val), val => isPasswordConfirmValid()]"/>
-    <div>
+    </QCardSection>
+    <QCardActions align="right">
     <QSpace/>
       <QBtn type="submit" label="Reset password"/>
-    </div>
+    </QCardActions>
 </QForm>
 </QCard>
 </div>

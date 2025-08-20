@@ -8,6 +8,7 @@
 <br/>
 <QCard>
   <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+  <QCardSection>
       <QInput label="Email address"
           stack-label
           v-model="email"
@@ -55,10 +56,11 @@
           type="password"
           v-model="passwordConfirm"
           :rules="[val => isFieldEmpty(val), val => isPasswordConfirmValid()]"/>
-    <div>
+  </QCardSection>
+    <QCardActions align="right">
     <QSpace/>
       <QBtn type="submit" label="Create account"/>
-    </div>
+    </QCardActions>
 </QForm>
 </QCard>
 </template>

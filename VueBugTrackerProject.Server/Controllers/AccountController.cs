@@ -6,6 +6,7 @@ using Sodium;
 using System.Diagnostics;
 using VueBugTrackerProject.Classes;
 using VueBugTrackerProject.Classes.DTOs;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace VueBugTrackerProject.Server.Controllers
 {
@@ -234,10 +235,62 @@ namespace VueBugTrackerProject.Server.Controllers
             try
             {
                 var account = await _userManager.GetUserAsync(User);
-                await _userManager.ChangePasswordAsync(account, passwordDTO.OldPassword, passwordDTO.NewPassword);
-                return NoContent();
+                var result =  await _userManager.ChangePasswordAsync(account, passwordDTO.OldPassword, passwordDTO.NewPassword);
+                if (result.Succeeded)
+                    return NoContent();
+                //Section if user inputted the wrong password credentials
+                return Unauthorized();
             }
             catch (Exception ex) 
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Function to save and update a user's icon.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadicon")]
+        [Authorize]
+        public async Task<IActionResult> UploadIcon()
+        {
+            try
+            {
+                //Relative path of avatar folder
+                var path = Path.GetRelativePath("C:\\Users\\samue\\source\\repos\\VueBugTrackerProject\\VueBugTrackerProject.Server\\", "C:\\Users\\samue\\source\\repos\\VueBugTrackerProject\\vuebugtrackerproject.client\\Avatars\\");
+
+                //Ensures avatar folder exists
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                //Gets user
+                var account = await _userManager.GetUserAsync(User);
+
+                //Gets uploaded icon
+                var icon = Request.Form.Files.First();
+
+                //Creates icon filename, {account id}.gif
+                var fileName = Path.Combine(path, $"{account.Id}.gif");
+
+                //Copies file to 
+               using (Stream fileStream = new FileStream(fileName, FileMode.Create))
+                {
+                    await icon.CopyToAsync(fileStream);
+                }
+
+                //Sets account icon path
+                account.Icon = fileName;
+
+                //Saves changes
+                await _context.SaveChangesAsync();
+
+                //TODO: return icon link to client
+                return Ok(fileName);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -254,6 +307,7 @@ namespace VueBugTrackerProject.Server.Controllers
         public async Task<IActionResult> DeleteUser([FromBody] string accountId)
          {
             //TODO: possibly allow admins and super user to delete accounts
+            //TODO: delete user avatar if not null
             try
             {
                 //Cancels the request if the ID supplied does not match the logged in user

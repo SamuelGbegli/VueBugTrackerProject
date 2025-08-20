@@ -1,5 +1,6 @@
 <template>
-  <div v-if="statusCode === 200">
+    <div v-if="statusCode === 200">
+  <div class="q-gutter-md">
     <QBanner>
       <h3>{{ project.name }}</h3>
       <h6>{{ project.summary }}</h6>
@@ -15,6 +16,7 @@
   </div>
   <div v-if="(statusCode && statusCode != 200)">
     <ErrorBanner :message="errorMessage" :prompt-type="errorPromptType"/>
+  </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -50,7 +52,7 @@ onMounted(async ()=>{
   }
   catch(ex){
     //Error handling if project could not be fetched
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     //Updates status code to show error banner
     statusCode.value = error.status;
     console.log(error);

@@ -5,9 +5,9 @@
     <QHeader reveal bordered class="bg-primary text-white">
       <QToolbar>
         <QToolbarTitle>
-          <QAvatar>
+          <!--<QAvatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-          </QAvatar>
+          </QAvatar>-->
           VueBugTracker
         </QToolbarTitle>
         <QSpace/>
@@ -20,7 +20,7 @@
         <QBtn v-if="!authStore.isLoggedIn()" to="register" label="Register"/>
 
         <!-- section for logged in users -->
-          <UserIcon v-if="authStore.isLoggedIn()" :username="authStore.user.username"/>
+          <UserIcon v-if="authStore.isLoggedIn()" :username="authStore.user.username" :icon="authStore.user.icon"/>
         </div>
         <QBtn v-if="authStore.isLoggedIn()" dense flat round icon="menu" @click="toggleRightDrawer"/>
       </QToolbar>
@@ -53,7 +53,7 @@
             Create project
           </QItemSection>
         </QItem>
-        <QItem clickable>
+        <QItem clickable href="settings">
           <QItemSection avatar>
             <QAvatar size="30px">
 
@@ -119,6 +119,7 @@ import router from '@/router/router';
 
 import { useAuthStore } from '@/stores/AuthStore';
 import AccountRole from '@/enumConsts/Role';
+import axios from 'axios';
 
 //Store for getting logged in user info
 const authStore = useAuthStore();
@@ -134,12 +135,19 @@ const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 }
 
+//Logs the user out of the application
 async function logout(){
     //Shows loading screen
     Loading.show({
       message: "Logging out..."
     });
-  await authStore.logout();
+    //Logs user out from backend
+  await axios.post("/auth/logout", {});
+
+  //Removes user store from frontend
+  authStore.$patch((state) => {
+    state.user = null;
+  });
   Loading.hide();
   router.go(0);
 }

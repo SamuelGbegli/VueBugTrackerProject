@@ -56,7 +56,6 @@
 <script setup lang="ts">
   import ProjectDTO from '@/classes/DTOs/ProjectDTO';
 import removeHTMLTags from '@/classes/helpers/RemoveHTMLTags';
-import sanitiseHTML from '@/classes/helpers/SanitiseHTML';
 import Visibility from '@/enumConsts/Visibility';
 import { onBeforeMount, ref } from 'vue';
 import { Loading, Notify } from 'quasar'
@@ -101,7 +100,7 @@ import ProjectViewModel from '@/viewmodels/ProjectViewModel';
       message: "Please wait..."
     });
 
-    let projectDTO = new ProjectDTO();
+    const projectDTO = new ProjectDTO();
     projectDTO.Name = projectName.value;
     projectDTO.Summary = summary.value;
     projectDTO.Visibility = options.indexOf(visibility.value);
@@ -127,7 +126,8 @@ import ProjectViewModel from '@/viewmodels/ProjectViewModel';
         }
       }
     }
-    catch(ex){
+    //Something went wrong, shows error message
+    catch{
       Notify.create({
     message: "Something went wrong when processing your request. Please try again later.",
     position: "bottom",

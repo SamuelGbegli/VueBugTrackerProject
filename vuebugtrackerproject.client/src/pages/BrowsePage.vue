@@ -6,17 +6,18 @@
   </div>
   <div v-if="!statusCode || statusCode === 200">
     <div class="row q-gutter-md">
-      <ProjectPreview v-for="x in projects.projects" :-project="x"/>
+      <ProjectPreview v-for="x in projects.projects" :-project="x" v-bind:key="(x as ProjectPreviewViewModel).id"/>
     </div>
       <div class="row">
         <QSpace/>
         <QPagination v-model="currentPage"
+                   v-if="!!statusCode"
                    :min="1"
                    :max="numberOfPages"
                    @update:model-value="router.push({path: `/browse/${currentPage}`})"
                    input />
       </div>
-      <QInnerLoading
+      <QInnerLoading style="height: 100%;"
         :showing="!statusCode"/>
     </div>
     <div v-else>
@@ -29,7 +30,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import ProjectPreview from '@/components/ProjectPreview.vue';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 import ProjectContainer from '@/viewmodels/ProjectContainer'
-import ProjectViewModel from '@/viewmodels/ProjectViewModel';
+import type ProjectPreviewViewModel from '@/viewmodels/ProjectPreviewViewModel';
 import axios, { AxiosError } from 'axios';
 import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -77,7 +78,7 @@ onBeforeMount(async () =>{
   }
   catch(ex){
     //Sets status code error
-    let error = ex as AxiosError;
+    const error = ex as AxiosError;
     statusCode.value = error.status;
   }
 })

@@ -38,6 +38,7 @@
       </div>
         </QCardSection>
       </QCard>
+      <br/>
       <QCard>
         <QCardSection>
           <div class="row">
@@ -59,22 +60,20 @@
 </template>
 <script setup lang="ts">
   import axios, { AxiosError } from 'axios';
-  import { onBeforeMount, onMounted, ref } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import UserIcon from '@/components/UserIcon.vue';
-import BugViewModel from '@/viewmodels/BugViewModel';
 import { Dialog, Loading, Notify } from 'quasar';
 import BugForm from '@/components/BugForm.vue';
 import ConfirmationDialog from '@/dialogs/ConfirmationDialog.vue';
 import BugDTO from '@/classes/DTOs/BugDTO';
 
-const bugSeverity = ["Low", "Medium", "High"];
+//const bugSeverity = ["Low", "Medium", "High"];
 
     const bug = ref();
     const statusCode = ref();
     const route = useRoute();
     const router = useRouter();
-    const showDialog = ref(false);
+    //const showDialog = ref(false);
     const currentTab = ref("Edit bug");
 
     onBeforeMount(async ()=>{
@@ -86,7 +85,7 @@ const bugSeverity = ["Low", "Medium", "High"];
         console.log(bug.value);
       }
       catch (ex){
-        let error = ex as AxiosError;
+        const error = ex as AxiosError;
         statusCode.value = error.status;
       }
     });
@@ -106,7 +105,7 @@ const bugSeverity = ["Low", "Medium", "High"];
         message: "Please wait..."
       });
       try{
-        const response = await axios.patch("/bugs/togglebugstatus", bug.value.id,{
+        await axios.patch("/bugs/togglebugstatus", bug.value.id,{
           headers: {"Content-Type": "application/json"}
         });
         router.go(0);
@@ -133,11 +132,11 @@ const bugSeverity = ["Low", "Medium", "High"];
       }
     }).onOk( async () =>{
       alert("Clicked on Yes");
-      let bugDTO = new BugDTO();
+      const bugDTO = new BugDTO();
       bugDTO.bugID = bug.value.id;
       bugDTO.projectID = bug.value.projectID;
       try{
-        const response = await axios.delete("/bugs/deletebug", {
+        await axios.delete("/bugs/deletebug", {
         headers:{
 
         },

@@ -21,11 +21,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="x in bugs">
+          <tr v-for="x in bugs" v-bind:key="(x as BugPreviewViewModel).id">
             <td>{{ (x as BugPreviewViewModel).summary }}</td>
             <td>{{ formatDate((x as BugPreviewViewModel).dateModified) }}</td>
             <td>
-              <UserIcon :username="(x as BugPreviewViewModel).creatorName"/>
+              <UserIcon :username="(x as BugPreviewViewModel).creatorName" :icon="(x as BugPreviewViewModel).creatorID"/>
             </td>
             <td>
               <QChip :color="getChipColour(x.severity)">
@@ -133,7 +133,7 @@ import UserIcon from '@/components/UserIcon.vue';
 import BugPreviewViewModel from '@/viewmodels/BugPreviewViewModel';
 import axios from 'axios';
 import { onBeforeMount, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
 import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import formatDate from '@/classes/helpers/FormatDate';
@@ -219,7 +219,6 @@ const filterFormValues = ref({
 });
 
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 
 onBeforeMount(async() =>{
@@ -242,16 +241,15 @@ onBeforeMount(async() =>{
 async function getBugs(){
   loading.value = true;
   try{
-    //const response = await axios.get(`/bugs/getbugpreviews?projectId=${route.params.projectId}&page=${currentPage.value}`)
     console.log(JSON.stringify(bugFilterDTO.value))
     const response = await axios.post(`/bugs/getbugpreviews`, bugFilterDTO.value);
-    let data: BugPreviewViewModel[] = [];
+    const data: BugPreviewViewModel[] = [];
     for(let i = 0; i < response.data.length; i ++){
       data.push(Object.assign(new BugPreviewViewModel(), response.data[i]));
     }
     bugs.value = data;
   }
-  catch(ex){
+  catch{
 
   }
   finally{
