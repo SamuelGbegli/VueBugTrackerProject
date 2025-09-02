@@ -1,5 +1,6 @@
-<!--Page for searching for and filtering projects projects-->
+<!--Page for searching for and filtering projects-->
 <template>
+  <div class="q-gutter-md">
   <!--Shows title and button to change filter-->
   <div class="row">
     <h3>Search</h3>
@@ -7,9 +8,9 @@
     <QBtn @click="showFilterDialog = true" label="Change filter"/>
   </div>
   <!--Visible when projects are found or being loaded-->
-  <div v-if="!statusCode || statusCode === 200">
+  <div class="q-gutter-md" v-if="!statusCode || statusCode === 200">
   <div v-if="!!statusCode">
-    <span>Total projects: {{ projects.totalProjects }}</span>
+    <h6>Total projects: {{ projects.totalProjects }}</h6>
   </div>
     <div v-if="projects.totalProjects > 0">
       <!--Shows list of projects if any were found-->
@@ -39,6 +40,7 @@
       <ErrorBanner :prompt-type="statusCode === 500? ErrorPromptType.ReloadButton : ErrorPromptType.GoBackButtonOnly"
       :message="statusCode === 500? 'There was an error connecting with the server.' : 'The page you requested does not exist.'"/>
     </div>
+  </div>
     <QDialog v-model="showFilterDialog">
       <QCard style="min-width: 400px;">
         <QCardSection>

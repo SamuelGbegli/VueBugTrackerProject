@@ -1,5 +1,3 @@
-import Severity from "@/enumConsts/Severity";
-
 export default class BugPreviewViewModel{
 
 	// Unique identifier for the bug.

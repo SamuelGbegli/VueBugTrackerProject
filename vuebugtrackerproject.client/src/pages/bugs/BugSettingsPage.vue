@@ -67,8 +67,6 @@ import BugForm from '@/components/BugForm.vue';
 import ConfirmationDialog from '@/dialogs/ConfirmationDialog.vue';
 import BugDTO from '@/classes/DTOs/BugDTO';
 
-//const bugSeverity = ["Low", "Medium", "High"];
-
     const bug = ref();
     const statusCode = ref();
     const route = useRoute();
@@ -78,6 +76,11 @@ import BugDTO from '@/classes/DTOs/BugDTO';
 
     onBeforeMount(async ()=>{
       //TODO: add error handling for when loading bug fails
+      getBug()
+    });
+
+    //Gets bug from the backend
+    async function getBug(){
       try{
         const response = await axios.get(`/bugs/get/${route.params.bugId}`);
         statusCode.value = response.status;
@@ -88,7 +91,7 @@ import BugDTO from '@/classes/DTOs/BugDTO';
         const error = ex as AxiosError;
         statusCode.value = error.status;
       }
-    });
+    }
 
     //Shows dialog to open a closed bug, and vice versa
     function showBugToggleDialog(){
@@ -108,7 +111,7 @@ import BugDTO from '@/classes/DTOs/BugDTO';
         await axios.patch("/bugs/togglebugstatus", bug.value.id,{
           headers: {"Content-Type": "application/json"}
         });
-        router.go(0);
+        getBug()
       }
       catch{
         Notify.create({
@@ -121,6 +124,7 @@ import BugDTO from '@/classes/DTOs/BugDTO';
     })
   }
 
+  // Deletes bug from project
   async function deleteBug(){
     //Creates delete dialog
     Dialog.create({
@@ -131,7 +135,6 @@ import BugDTO from '@/classes/DTOs/BugDTO';
         message: "Deleting a bug is an irreversable process. Are you sure you want to continue?"
       }
     }).onOk( async () =>{
-      alert("Clicked on Yes");
       const bugDTO = new BugDTO();
       bugDTO.bugID = bug.value.id;
       bugDTO.projectID = bug.value.projectID;
@@ -142,7 +145,7 @@ import BugDTO from '@/classes/DTOs/BugDTO';
         },
         data: bugDTO
       });
-      router.push(`/project/${bugDTO.projectID}`);
+      router.push(`/project/${bugDTO.projectID}/bugs`);
       }
       catch{
         Notify.create({

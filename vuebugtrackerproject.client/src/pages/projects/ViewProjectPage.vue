@@ -1,5 +1,6 @@
 <template>
 <div class="q-pa-md row q-gutter-md">
+  <!--Left hand side of page, contains description-->
   <div class="col-8">
     <QCard style="min-height: 60vh">
       <QCardSection v-if="statusCode === 200">
@@ -11,6 +12,7 @@
       </QCardSection>
     </QCard>
   </div>
+  <!--Right hand side of page, contains project information-->
   <div class="col">
     <QCard>
       <div v-if="statusCode === 200">
@@ -36,11 +38,13 @@
       </QCardSection>
       <QCardSection>
         <h6>Tags</h6>
-        <div>
-          <QChip color="blue" v-if="project.tags.length > 0" v-for="x in project.tags">
+        <div v-if="project.tags.length > 0">
+          <QChip color="blue"  v-for="x in project.tags" v-bind:key="project.tags.indexOf(x)">
             {{ x }}
           </QChip>
-          <span v-else>No tags provided</span>
+        </div>
+        <div v-else>
+          <span>No tags provided</span>
         </div>
       </QCardSection>
       </div>
@@ -56,12 +60,10 @@
 <script setup lang="ts">
 
 import axios, { AxiosError } from 'axios';
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import router from '@/router/router';
 import ProjectViewModel from '@/viewmodels/ProjectViewModel';
 import UserIcon from '@/components/UserIcon.vue';
-import { format } from 'quasar';
 import formatDate from '@/classes/helpers/FormatDate';
 
   const project = ref(new ProjectViewModel());
@@ -78,7 +80,7 @@ import formatDate from '@/classes/helpers/FormatDate';
       console.log(project.value.tags);
     }
     catch (ex){
-      let error = ex as AxiosError;
+      const error = ex as AxiosError;
       statusCode.value = error.status;
     }
   });

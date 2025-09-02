@@ -11,7 +11,7 @@
   </div>
   <ErrorBanner v-else
     :prompt-type=" ErrorPromptType.GoBackButtonOnly"
-    message="The page you requested does not exist."/>
+    message="You do not have permission to view this page."/>
 </template>
 <script setup lang="ts">
   import BugForm from '@/components/BugForm.vue';
@@ -27,6 +27,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 
 //Used to verify if the user has created the project
+//TODO
   onBeforeMount(async () =>{
     try{
       const response = await axios.get(`/projects/get/${route.params.projectId}`);

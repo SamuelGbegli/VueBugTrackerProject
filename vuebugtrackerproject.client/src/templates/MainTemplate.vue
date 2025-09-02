@@ -27,61 +27,25 @@
     </QHeader>
 
     <!-- section for logged in users -->
-    <!-- TODO: add links to pages and functions -->
     <QDrawer v-if="authStore.isLoggedIn()" side="right" v-model="rightDrawerOpen" overlay bordered class="bg-grey-9">
       <QScrollArea class="fit">
       <QList>
-        <QItem clickable>
-          <QItemSection avatar>
-            <QAvatar size="30px">
-
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-            </QAvatar>
-          </QItemSection>
-          <QItemSection>
-            Profile
-          </QItemSection>
-        </QItem>
         <QItem clickable href="/createproject">
-          <QItemSection avatar>
-            <QAvatar size="30px">
-
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-            </QAvatar>
-          </QItemSection>
           <QItemSection>
             Create project
           </QItemSection>
         </QItem>
-        <QItem clickable href="settings">
-          <QItemSection avatar>
-            <QAvatar size="30px">
-
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-            </QAvatar>
-          </QItemSection>
+        <QItem clickable href="/settings">
           <QItemSection>
             User settings
           </QItemSection>
         </QItem>
         <QItem v-if="authStore.getUserRole() != AccountRole.Normal" clickable href="/userlist">
-          <QItemSection avatar>
-            <QAvatar size="30px">
-
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-            </QAvatar>
-          </QItemSection>
           <QItemSection>
             User list
           </QItemSection>
         </QItem>
         <QItem clickable @click="logout">
-          <QItemSection avatar>
-            <QAvatar size="30px">
-
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"/>
-            </QAvatar>
-          </QItemSection>
           <QItemSection>
             Logout
           </QItemSection>
@@ -137,6 +101,7 @@ const toggleRightDrawer = () => {
 
 //Logs the user out of the application
 async function logout(){
+
     //Shows loading screen
     Loading.show({
       message: "Logging out..."
@@ -149,7 +114,9 @@ async function logout(){
     state.user = null;
   });
   Loading.hide();
-  router.go(0);
+
+  //Ensures drawer is closed
+  rightDrawerOpen.value = false
 }
 
 //Function to open the login dialog

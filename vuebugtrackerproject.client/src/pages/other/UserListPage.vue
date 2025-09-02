@@ -1,7 +1,6 @@
 <!--Page for viewing a list of accounts-->
 <!--TODO:
   Test pagination by adding 20+ accounts
-  Show not found message if user is not admin or super user
 -->
 <template>
   <div v-if="authStore.getUserRole() != AccountRole.Normal">

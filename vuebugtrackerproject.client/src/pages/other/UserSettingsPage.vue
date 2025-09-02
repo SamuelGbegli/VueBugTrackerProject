@@ -30,11 +30,11 @@
                     <!--TODO: Show larger version of current user avatar-->
                   </div>
                   <div class="col">
-                    <QUploader url="https://localhost:5173/accounts/uploadicon"
-                               auto-upload
-                               label="Upload icon"
-                               accept="image/jpeg, image/png, image/gif"
-                               style="max-width: 300px;" />
+                    <QUploader
+                        auto-upload
+                        label="Upload icon"
+                        accept="image/jpeg, image/png, image/gif"
+                        style="max-width: 300px;" />
 
                     <!--TODO: update avatar when icon is uploaded-->
                   </div>
@@ -42,7 +42,7 @@
               </div>
             </QTabPanel>
             <QTabPanel name="Credentials">
-              <div>
+              <div class="q-gutter-md">
               <!--Change email address section-->
                 <QCard>
                   <QForm @submit="onSubmit(AccountChangeValue.Email)" style="max-width: 500px;">
@@ -262,6 +262,7 @@ async function onSubmit(credentials:number) {
         type: "negative"
       });
   }
+  Loading.hide();
 }
 
 //Deletes the user's account

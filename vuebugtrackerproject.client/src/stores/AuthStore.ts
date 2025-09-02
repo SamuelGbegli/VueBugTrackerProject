@@ -5,7 +5,6 @@ import AccountRole from "@/enumConsts/Role";
 
 import axios, { AxiosError } from "axios";
 import { defineStore } from "pinia";
-import { useRouter } from "vue-router";
 
 export const useAuthStore = defineStore("auth", {
   //User value is user item fetched from localStorage

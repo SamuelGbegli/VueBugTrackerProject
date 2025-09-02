@@ -8,8 +8,8 @@ if they forget their password-->
   If you forgot the password to your account, you can use the form below to reset it.
 </QBanner>
 <br/>
-<QCard v-if="!isFormSubmitted">
-  <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+<QCard style="width: 600px;" v-if="!isFormSubmitted">
+  <QForm @submit="onSubmit" style="padding: 10px;">
     <QInput label="Username"
           stack-label
          v-model="username"
@@ -33,7 +33,7 @@ if they forget their password-->
 <script setup lang="ts">
 import { ref } from 'vue';
 import UserDTO from '@/classes/DTOs/UserDTO';
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Loading, Notify } from 'quasar';
 
 //The account's email address

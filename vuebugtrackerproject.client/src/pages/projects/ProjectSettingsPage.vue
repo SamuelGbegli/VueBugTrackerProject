@@ -22,7 +22,7 @@
               </QBanner>
               <br/>
               <div>
-              <ProjectForm :-project="project"/>
+              <ProjectForm v-if="!!project" :-project="project"/>
               </div>
             </div>
           </QTabPanel>
@@ -40,7 +40,7 @@
                   <tr>
                     <th>User</th>
                     <th>Role</th>
-                    <th></th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,7 +167,7 @@ import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
   //Stores project to be viewed
-  const project = ref(new ProjectViewModel());
+  const project = ref();
   //Stores status code when fetching project from backend
   const statusCode = ref();
   const route = useRoute();
@@ -202,6 +202,7 @@ import { useRoute, useRouter } from 'vue-router';
         const response = await axios.get(`/projects/get/${route.params.projectId}`);
         statusCode.value = response.status;
         project.value = Object.assign(new ProjectViewModel(), response.data);
+        console.log(project.value)
       }
       catch (ex){
         const error = ex as AxiosError;
@@ -300,9 +301,10 @@ import { useRoute, useRouter } from 'vue-router';
       showDialog.value = false;
 
       //Reloads user permissions
-      //TODO: add function to change page if adding permission
+      if(!!selectedPermission.value){
+        pageNumber.value = Math.ceil(userPermissions.value.totalPermissions + 1)
+      }
       await loadUserPermissions();
-      pageNumber.value = 1;
 
       //Show notification if successful
       Notify.create({

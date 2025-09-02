@@ -18,7 +18,7 @@ namespace VueBugTrackerProject.Server
             await SeedSuperUser(context, userManager);
         }
         /// <summary>
-        /// Adds a super user account to the app's database, if one doesn't
+        /// Adds a super user account to the app's database, if one doesn't already
         /// exist.
         /// </summary>
         /// <param name="context">The database context.</param>

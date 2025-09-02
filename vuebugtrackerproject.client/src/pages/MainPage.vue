@@ -20,8 +20,11 @@
       <QCard style="width: auto;">
         <QCardSection>
           <div>
-            <div class="q-pa-md row items-start q-gutter-md" v-if="userProjectsStatusCode === 200">
+            <div class="q-pa-md row items-start q-gutter-md" v-if="userProjectsStatusCode === 200 && recentUserProjects.length > 0">
               <ProjectPreview v-for="x in recentUserProjects" :-project="(x as ProjectPreviewViewModel)" v-bind:key="(x as ProjectPreviewViewModel).id"/>
+            </div>
+            <div class="q-pa-md row items-start q-gutter-md" v-else-if="userProjectsStatusCode === 200 && recentUserProjects.length == 0">
+              <p>You have not created any projects. <a href="/createproject">Create project</a></p>
             </div>
             <QBanner v-else-if="userProjectsStatusCode === 500">Cannot fetch projects.</QBanner>
             <div class="q-pa-md row items-start q-gutter-md" v-else>
@@ -34,10 +37,6 @@
             </div>
           </div>
         </QCardSection>
-        <!--Would have added link to user project page-->
-        <!-- <QCardActions align="right">
-          <QBtn label="View more"/>
-        </QCardActions> -->
       </QCard>
     </div>
 <br/>

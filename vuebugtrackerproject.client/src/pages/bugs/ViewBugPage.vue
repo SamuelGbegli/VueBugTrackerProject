@@ -49,29 +49,11 @@
       </QCard>
     </div>
   </div>
-  <QDialog v-model="showDialog" persistent>
-    <QCard>
-      <QCardSection>
-        <h5>
-          {{ bug.isOpen ? "Close bug"
-        : "Reopen bug" }}
-        </h5>
-      </QCardSection>
-      <QCardSection>
-        {{ bug.isOpen ? "Are you sure you want to close this bug?"
-        : "Are you sure you want to reopen this bug?" }}
-      </QCardSection>
-      <QCardActions>
-        <QBtn label="Yes" @click="toggleBug" v-close-popup/>
-        <QBtn label="No" v-close-popup/>
-      </QCardActions>
-    </QCard>
-  </QDialog>
   </template>
   <script setup lang="ts">
 
   import axios, { AxiosError } from 'axios';
-  import { onBeforeMount, onMounted, ref } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import UserIcon from '@/components/UserIcon.vue';
 import BugViewModel from '@/viewmodels/BugViewModel';
@@ -86,7 +68,6 @@ const bugSeverity = ["Low", "Medium", "High"];
     const statusCode = ref();
     const route = useRoute();
     const router = useRouter();
-    const showDialog = ref(false);
 
     onBeforeMount(async ()=>{
       //TODO: add error handling for when loading project fails
@@ -96,7 +77,7 @@ const bugSeverity = ["Low", "Medium", "High"];
         bug.value = response.data;
       }
       catch (ex){
-        let error = ex as AxiosError;
+        const error = ex as AxiosError;
         statusCode.value = error.status;
       }
     });
@@ -120,11 +101,12 @@ const bugSeverity = ["Low", "Medium", "High"];
         message: "Please wait..."
       });
       try{
-        const response = await axios.patch("/bugs/togglebugstatus", bug.value.id,{
+        await axios.patch("/bugs/togglebugstatus", bug.value.id,{
           headers: {"Content-Type": "application/json"}
         });
         router.go(0);
       }
+      //Section if something goes wrong
       catch{
         Notify.create({
           message: "Something went wrong when processing your request. Please try again later.",

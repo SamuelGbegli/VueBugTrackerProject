@@ -1,13 +1,13 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-gutter-md">
   <div class="row">
-      <h6>Number of bugs: {{ totalBugs }}</h6>
+      <h6>Number of bugs: {{ bugContainer.numberOfBugs }}</h6>
       <QSpace/>
       <QBtn @click="openDialog" label="Filter"/>
       <QBtn v-if="project.ownerID === authStore.getUserID()" :to="`/project/${route.params.projectId}/bugs/add`"
       label="Add bug"/>
   </div>
-  <div v-if="!!bugs && bugs.length > 0">
+  <div v-if="!!bugContainer && bugContainer.numberOfBugs > 0">
   <!--Table to show bugs-->
     <QMarkupTable>
         <thead>
@@ -21,11 +21,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="x in bugs" v-bind:key="(x as BugPreviewViewModel).id">
+          <tr v-for="x in bugContainer.bugPreviews" v-bind:key="(x as BugPreviewViewModel).id">
             <td>{{ (x as BugPreviewViewModel).summary }}</td>
             <td>{{ formatDate((x as BugPreviewViewModel).dateModified) }}</td>
             <td>
-              <UserIcon :username="(x as BugPreviewViewModel).creatorName" :icon="(x as BugPreviewViewModel).creatorID"/>
+              <UserIcon :username="(x as BugPreviewViewModel).creatorName" :icon="(x as BugPreviewViewModel).creatorIcon"/>
             </td>
             <td>
               <QChip :color="getChipColour(x.severity)">
@@ -63,7 +63,7 @@
       <!--Pagination control for showing different bugs-->
       <div class="row">
       <QSpace/>
-        <QPagination v-model="currentPage"
+        <QPagination v-model="bugContainer.currentPage"
         :min="1"
         :max="numberOfPages"
         input
@@ -143,18 +143,13 @@ import SortType from '@/enumConsts/SortType';
 import SortOrder from '@/enumConsts/SortOrder';
 import Severity from '@/enumConsts/Severity';
 import Status from '@/enumConsts/Status';
+import BugPreviewContainer from '@/viewmodels/BugPreviewContainer';
 
 //The number of pages of project bugs in the backend, in groups of 20
 const numberOfPages = ref(5);
 
-//The current page the user is on
-const currentPage = ref(1);
-
-//The number of bugs the project has
-const totalBugs = ref(0);
-
-//The bugs returned by the server
-const bugs = ref();
+//The bug container returned by the server
+const bugContainer = ref(new BugPreviewContainer());
 
 //Stores project information
 const project = ref(new ProjectViewModel());
@@ -227,9 +222,6 @@ onBeforeMount(async() =>{
   bugFilterDTO.value.projectID = route.params.projectId.toString();
 
   await getBugs();
-  const response = await axios.get(`/bugs/getnumberofbugs/${route.params.projectId}`);
-  totalBugs.value = response.data;
-  numberOfPages.value = Math.ceil(totalBugs.value/20);
 
   const projectResponse = await axios.get(`/projects/get/${route.params.projectId}`);
   project.value = projectResponse.data;
@@ -241,13 +233,10 @@ onBeforeMount(async() =>{
 async function getBugs(){
   loading.value = true;
   try{
-    console.log(JSON.stringify(bugFilterDTO.value))
     const response = await axios.post(`/bugs/getbugpreviews`, bugFilterDTO.value);
-    const data: BugPreviewViewModel[] = [];
-    for(let i = 0; i < response.data.length; i ++){
-      data.push(Object.assign(new BugPreviewViewModel(), response.data[i]));
-    }
-    bugs.value = data;
+    bugContainer.value = Object.assign(response.data)
+    //Sets the maximum number of pages visible at one point
+    numberOfPages.value = Math.ceil(bugContainer.value.numberOfBugs / 20)
   }
   catch{
 
@@ -259,12 +248,11 @@ async function getBugs(){
 
 //Opens the filter dialog
 function openDialog(){
-  //TODO: assign values to filter
   showFilterDialog.value = true;
 }
 
 async function onPageUpdate(){
-  bugFilterDTO.value.pageNumber = currentPage.value;
+  bugFilterDTO.value.pageNumber = bugContainer.value.currentPage;
   await getBugs();
 }
 

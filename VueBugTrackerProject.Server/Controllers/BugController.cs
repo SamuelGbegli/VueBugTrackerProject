@@ -203,13 +203,17 @@ namespace VueBugTrackerProject.Server.Controllers
                         break;
                 }
 
-                //Creates and returns a list of bug summaries
-                var bugPreviews = new List<BugPreviewViewModel>();
+                //Creates and returns a container with bug summaries
+                var bugPreviewContainer = new BugPreviewContainer();
+                bugPreviewContainer.CurrentPage = bugFilterDTO.PageNumber;
+                bugPreviewContainer.NumberOfBugs = bugs.Count;
+
                 foreach (var bug in bugs.OrderByDescending(b => b.DateModified).Skip((bugFilterDTO.PageNumber - 1) * 20).Take(20))
                 {
-                    bugPreviews.Add(new BugPreviewViewModel(bug));
+                    bugPreviewContainer.BugPreviews.Add(new BugPreviewViewModel(bug));
                 }
-                return Ok(bugPreviews);
+
+                return Ok(bugPreviewContainer);
             }
             catch (Exception ex)
             {
@@ -509,7 +513,9 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (project == null) return NotFound();
 
                 //Gets bug in project
-                var bug = project.Bugs.Find(b => b.ID == bugDTO.BugID);
+                var bug = await _databaseContext.Bugs
+                    .Include(b => b.Comments)
+                    .FirstOrDefaultAsync(b => b.ID == bugDTO.BugID);
                 if (bug == null) return NotFound();
 
                 //Gets user account
@@ -519,6 +525,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (project.Owner != account && bug.Creator != account) return Forbid();
 
                 //Removes bug and saves changes
+                bug.Comments.Clear();
                 project.Bugs.Remove(bug);
                 project.DateModified = DateTime.UtcNow;
                 await _databaseContext.SaveChangesAsync();

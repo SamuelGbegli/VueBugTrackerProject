@@ -22,8 +22,6 @@ import ProjectTemplate from "@/templates/ProjectTemplate.vue";
 
 import { createRouter, createWebHistory } from "vue-router"
 
-import { useAuthStore } from "@/stores/AuthStore";
-import AccountRole from "@/enumConsts/Role";
 import UserSettingsPage from "@/pages/other/UserSettingsPage.vue";
 
 const router = createRouter({

@@ -26,8 +26,8 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <summary>
         /// Returns a list of user permission data.
         /// </summary>
-        /// <param name="projectID"></param>
-        /// <param name="pageNumber"></param>
+        /// <param name="projectID">THe ID of the project that will be selected.\</param>
+        /// <param name="pageNumber">The page of prermissions that will be returned.</param>
         /// <returns></returns>
         [HttpGet]
         [Route("get")]
@@ -74,7 +74,7 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <summary>
         /// Adds a new user permission to the project.
         /// </summary>
-        /// <param name="permissionDTO"></param>
+        /// <param name="permissionDTO">A DTO for handling user permissions</param>
         /// <returns></returns>
         [HttpPost]
         [Route("add")]
@@ -119,7 +119,7 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <summary>
         /// Updates a user permission.
         /// </summary>
-        /// <param name="permissionDTO"></param>
+        /// <param name="permissionDTO">A DTO for handling user permissions</param>
         /// <returns></returns>
         [HttpPatch]
         [Route("update")]
@@ -162,7 +162,7 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <summary>
         /// Deletes a user permission.
         /// </summary>
-        /// <param name="permissionDTO"></param>
+        /// <param name="permissionDTO">A DTO for handling user permissions</param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
@@ -199,7 +199,7 @@ namespace VueBugTrackerProject.Server.Controllers
         /// <summary>
         /// Checks if the user can create a user permission for the project requested.
         /// </summary>
-        /// <param name="username"></param>
+        /// <param name="username">The username to be checked.</param>
         /// <returns></returns>
         [HttpGet]
         [Route("isnamevalid")]
@@ -230,12 +230,18 @@ namespace VueBugTrackerProject.Server.Controllers
                 //User does not have a permission and can be added
                 return Ok();
             }
-            catch(Exception ex)
+            //Something went wrong, show an error
+            catch (Exception ex)
             {
                 return StatusCode(500, "Cannot validate username. Please try again later.");
             }
         }
 
+        /// <summary>
+        /// Checks if the user has permission to view a restricted project
+        /// </summary>
+        /// <param name="permissionDTO">A DTO for handling user permissions.</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("validate")]
         [Authorize]
@@ -266,6 +272,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 //Permission is valid
                 return Ok();
             }
+            //Something went wrong, show an error
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);

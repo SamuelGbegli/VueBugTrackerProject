@@ -21,9 +21,9 @@ namespace VueBugTrackerProject.Server.Services
         /// <summary>
         /// Sends an email to a recepient.
         /// </summary>
-        /// <param name="recepient"></param>
-        /// <param name="subject"></param>
-        /// <param name="text"></param>
+        /// <param name="recepient">The account receiving the email</param>
+        /// <param name="subject">The email's subject</param>
+        /// <param name="text">The text in the email's body.</param>
         public async Task SendEmail(Account recepient, string subject, string text)
         {
             var message = new MimeMessage();
@@ -47,10 +47,10 @@ namespace VueBugTrackerProject.Server.Services
         }
 
         /// <summary>
-        /// Creates an email text with instructions to reset a user password
+        /// Creates an email text with instructions to reset a user password.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="token"></param>
+        /// <param name="id">The ID of the user whose password is being reset.</param>
+        /// <param name="token">The password reset token used for the session</param>
         /// <returns></returns>
         public string GetPasswordResetEmailText(string id, string token)
         {

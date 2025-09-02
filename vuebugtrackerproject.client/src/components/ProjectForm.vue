@@ -15,33 +15,51 @@
             <QInput label="Summary"
                     stack-label
                     v-model="summary"
-                    :rules="[val => !! val || 'Please fill out this field.']" />
+                    :rules="[val => !! val || 'Please fill out this field.']">
+                    <template v-slot:append>
+                      <QIcon name="help">
+                        <QTooltip anchor="center right" self="center left">
+                          A brief description of the poject. Will be visible when browsing projects.
+                        </QTooltip>
+                      </QIcon>
+                    </template>
+                    </QInput>
           </div>
         </div>
       <div class="row q-gutter-lg">
         <div class="col" style="max-width: 400px;">
           <QInput label="Link"
                   stack-label
-                  v-model="link" />
+                  v-model="link">
+                    <template v-slot:append>
+                      <QIcon name="help">
+                        <QTooltip anchor="center right" self="center left">
+                          Use this field to link to an external page for your project.
+                        </QTooltip>
+                      </QIcon>
+                    </template>
+                    </QInput>
         </div>
         <div class="col" style="max-width: 400px;">
           <QSelect v-model="visibility" label="Visibility" stack-label :options="options"/>
         </div>
       </div>
       <br/>
-      <div class=" q-gutter-md" style="max-width: 70%;">
+      <div class=" q-gutter-md" style="max-width: 850px;">
         <p>Description</p>
         <QEditor v-model="description" min-height="5rem"/>
-      <!--  <p>Description preview</p>
-       <QCard flat bordered>
-        <QCardSection v-html="description"/>
-      </QCard> -->
-
       <QInput label="Tags (use ',' to separate tags)"
       stack-label
       v-model="tags"
-      type="textarea"/>
-
+      type="textarea">
+                    <template v-slot:append>
+                      <QIcon name="help">
+                        <QTooltip anchor="center right" self="center left">
+                          A set of keywords meant for users to more easily find you project.
+                        </QTooltip>
+                      </QIcon>
+                    </template>
+                    </QInput>
       </div>
 
     </div>
@@ -51,7 +69,6 @@
     </QCardActions>
     </QForm>
   </QCard>
-  <!--TODO: add tooltips to help the user-->
 </template>
 <script setup lang="ts">
   import ProjectDTO from '@/classes/DTOs/ProjectDTO';

@@ -79,13 +79,11 @@ async function onSubmit(){
   });
 
   //Assigns values to DTO
-  let bugDTO = new BugDTO();
+  const bugDTO = new BugDTO();
 
   bugDTO.summary = bugSummary.value;
   bugDTO.severity = options.indexOf(bugSeverity.value);
   bugDTO.description = bugDescription.value;
-
-  console.log(JSON.stringify(bugDTO));
 
   try{
     //block for editing an existing bug
@@ -94,22 +92,28 @@ async function onSubmit(){
       bugDTO.projectID = props.Bug.projectID;
 
       await axios.patch("/bugs/updatebug", bugDTO);
-        router.go(0);
+
+      //Notification if bug updates are saved
+      Notify.create({
+        message: "Successfully saved changes.",
+        position: "bottom",
+      type: "positive"
+  });
+
     }
     //Block for adding new bug
     else{
       bugDTO.projectID = route.params.projectId.toString();
 
-      const response = await axios.post("/bugs/addbug", bugDTO);
-    await router.push({path:`/project/${route.params.projectId}/bugs/`});
+      await axios.post("/bugs/addbug", bugDTO);
+      await router.push({path:`/project/${route.params.projectId}/bugs/`});
     }
   }
-  catch(ex){
-    console.log(ex);
+  catch {
     Notify.create({
-    message: "Something went wrong when processing your request. Please try again later.",
-    position: "bottom",
-    type: "negative"
+      message: "Something went wrong when processing your request. Please try again later.",
+      position: "bottom",
+      type: "negative"
   });
 }
 

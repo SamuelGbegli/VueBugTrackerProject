@@ -40,6 +40,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Local")));
 
+//Sets requirements for the user's password, username and roles
 builder.Services.AddIdentity<Account, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 8;
@@ -54,11 +55,13 @@ builder.Services.AddIdentity<Account, IdentityRole>(options =>
     .AddDefaultTokenProviders()
     .AddRoles<IdentityRole>();
 
+//Adds services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 
+//Seeds data if the database has no super user account
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

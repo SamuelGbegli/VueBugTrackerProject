@@ -12,9 +12,8 @@
   </ul>
 </QBanner>
 <br/>
-<QCard>
-
-  <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+<QCard style="width: 600px;">
+  <QForm @submit="onSubmit" style="padding: 10px;">
     <QCardSection>
   <QInput label="Password"
           stack-label
@@ -63,7 +62,7 @@ console.log(typeof response);
 isTokenValid.value = response.data;
 }
 catch(ex){
-let error = ex as AxiosError;
+const error = ex as AxiosError;
 console.log(error);
 }
   }
@@ -82,7 +81,7 @@ function isFieldEmpty(input: string){
 
 //Checks if a password is valid
 function isPasswordValid(input: string){
-  let errors: string[] = [];
+  const errors: string[] = [];
   if(input.length < 8) errors.push("Password must be at least 8 characters long.");
   if(!/[A-Z]/.test(input)) errors.push("At least 1 upper case letter is required.");
   if(!/[a-z]/.test(input)) errors.push("At least 1 lower case letter is required.");
@@ -111,7 +110,7 @@ Loading.show({
 });
 
 //Creates DTO to reset password
-let passwordResetDTO = new PasswordResetDTO();
+const passwordResetDTO = new PasswordResetDTO();
 passwordResetDTO.accountID = route.query.id as string;
 passwordResetDTO.password = password.value;
 passwordResetDTO.passwordResetToken = route.query.token as string;
@@ -121,7 +120,7 @@ try{
   const response = await axios.post("/auth/resetpassword", passwordResetDTO);
 
   //Creates user DTO with username returned from backend
-  let userDTO = new UserDTO();
+  const userDTO = new UserDTO();
   userDTO.Username = response.data;
   userDTO.Password = password.value;
 
@@ -139,7 +138,7 @@ type: "negative"
 });
 }
 }
-catch(ex){
+catch {
   //Server could not change password, error message is shown
   Notify.create({
 message: "Could not save changes. Please try again later.",

@@ -6,8 +6,8 @@
   Use the form below to create an account.
 </QBanner>
 <br/>
-<QCard>
-  <QForm @submit="onSubmit" style="padding: 10px; max-width: 450px">
+<QCard style="width: 600px;">
+  <QForm @submit="onSubmit" style="padding: 10px;">
   <QCardSection>
       <QInput label="Email address"
           stack-label
@@ -78,9 +78,6 @@ const username = ref("");
 const password = ref("");
 const passwordConfirm = ref("");
 
-//Shows error message if account creation or logging in fails
-const error = ref("");
-
 const authStore = useAuthStore();
 
 //Checks if a field is empty
@@ -108,7 +105,7 @@ async function isUsernameValid(input: string){
     const response = await axios.get(`accounts/verifyusername/${input}`)
     if(response.data) return "Username has been taken."
   }
-  catch(ex){
+  catch {
     return "Username cannot be validated. Please try again later.";
   }
 
@@ -117,7 +114,7 @@ async function isUsernameValid(input: string){
 
 //Checks if a password is valid
 function isPasswordValid(input: string){
-  let errors: string[] = [];
+  const errors: string[] = [];
   if(input.length < 8) errors.push("Password must be at least 8 characters long.");
   if(!/[A-Z]/.test(input)) errors.push("At least 1 upper case letter is required.");
   if(!/[a-z]/.test(input)) errors.push("At least 1 lower case letter is required.");
@@ -146,7 +143,7 @@ Loading.show({
 });
 
 
-let userDTO = new UserDTO();
+const userDTO = new UserDTO();
 userDTO.Emailaddress = email.value;
 userDTO.Password = password.value;
 userDTO.Username = username.value;
@@ -174,7 +171,7 @@ console.log(response);
     }
   }
 }
-catch (ex){
+catch {
   //Something went wrong, and show error notification
   Notify.create({
     message: "Cannot connect to server. Please try again later.",

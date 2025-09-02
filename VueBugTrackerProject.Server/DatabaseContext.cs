@@ -4,6 +4,9 @@ using VueBugTrackerProject.Classes;
 
 namespace VueBugTrackerProject.Server
 {
+    /// <summary>
+    /// Represents the database within the program
+    /// </summary>
     public class DatabaseContext : IdentityDbContext
     {
         public DbSet<Account> Accounts { get; set; }

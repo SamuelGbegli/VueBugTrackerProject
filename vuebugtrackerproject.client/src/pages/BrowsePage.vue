@@ -1,6 +1,7 @@
 <!--Page for browsing projects-->
 <template>
-  <div class="row">
+  <div class="q-gutter-md">
+    <div class="row">
     <h3>Browse</h3>
     <QSpace/>
   </div>
@@ -24,6 +25,7 @@
       <ErrorBanner :prompt-type="statusCode === 500? ErrorPromptType.ReloadButton : ErrorPromptType.GoBackButtonOnly"
       :message="statusCode === 500? 'There was an error connecting with the server.' : 'The page you requested does not exist.'"/>
     </div>
+  </div>
 </template>
 <script setup lang="ts">
 import ErrorBanner from '@/components/ErrorBanner.vue';

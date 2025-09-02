@@ -46,7 +46,6 @@ const route = useRoute();
 
 onMounted(async ()=>{
 
-  //TODO: add error handling if project cannot be fetched from database
   try{
   //Loads project from database
     const response = await axios.get(`/bugs/get/${route.params.bugId}`);

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoggedIn">
+  <div class="q-gutter-md" v-if="!!isLoggedIn">
     <h3>Create project</h3>
     <br/>
     <QBanner>
@@ -7,9 +7,13 @@
     </QBanner>
     <ProjectForm/>
   </div>
-  <div v-else>
+  <div v-else-if="isLoggedIn != null">
     <ErrorBanner :promptType="ErrorPromptType.LoginAndGoBackButtons"/>
   </div>
+  <QInnerLoading
+    :showing="isLoggedIn == null"
+    style="height: 100%;"
+    />
 </template>
 <script setup lang="ts">
   import { useAuthStore } from '@/stores/AuthStore';
@@ -19,9 +23,10 @@ import ProjectForm from '@/components/ProjectForm.vue';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 
 const authStore = useAuthStore();
-const isLoggedIn = ref();
+const isLoggedIn = ref(null);
 
   onMounted(async() =>{
+    console.log(isLoggedIn.value)
     isLoggedIn.value = await authStore.isLoggedInBackend();
   })
 
