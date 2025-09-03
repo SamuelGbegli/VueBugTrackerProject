@@ -38,7 +38,10 @@ namespace VueBugTrackerProject.Server.Services
             using var client = new SmtpClient();
             {
                 //SMTP client is local IP address
-                await client.ConnectAsync("127.0.0.1", 25);
+                /*
+                 * SMTP connection code goes here. The connection method may vary depending on the SMRP server you are using.
+                 * Please view this page for more information: https://mimekit.net/docs/html/T_MailKit_Net_Smtp_SmtpClient.htm
+                 */
 
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
