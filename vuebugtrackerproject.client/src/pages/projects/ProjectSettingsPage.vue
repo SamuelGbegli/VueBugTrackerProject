@@ -58,7 +58,6 @@
                       }}
                     </td>
                     <td>
-                    <!--TODO: Add actions for non-project owners-->
                     <div v-if="project.ownerID != (x as UserPermissionViewModel).accountID">
                       <QBtnDropdown v-if="project.visibility === Visibility.Restricted" label="Actions">
                       <QList>
@@ -196,13 +195,11 @@ import { useRoute, useRouter } from 'vue-router';
   });
 
   onBeforeMount(async () =>{
-    //TODO: add error handling for when loading project fails
     //Gets project from backend
     try{
         const response = await axios.get(`/projects/get/${route.params.projectId}`);
         statusCode.value = response.status;
         project.value = Object.assign(new ProjectViewModel(), response.data);
-        console.log(project.value)
       }
       catch (ex){
         const error = ex as AxiosError;
@@ -289,7 +286,6 @@ import { useRoute, useRouter } from 'vue-router';
         //Gets permission ID
         permissionDTO.permissionID = (selectedPermission.value as UserPermissionViewModel).id;
         //Sends request to server
-        console.log(JSON.stringify(permissionDTO));
         await axios.patch("/userpermissions/update", permissionDTO);
       }
       else{

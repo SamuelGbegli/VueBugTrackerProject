@@ -75,7 +75,6 @@ import BugDTO from '@/classes/DTOs/BugDTO';
     const currentTab = ref("Edit bug");
 
     onBeforeMount(async ()=>{
-      //TODO: add error handling for when loading bug fails
       getBug()
     });
 

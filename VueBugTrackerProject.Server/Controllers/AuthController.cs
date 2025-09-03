@@ -113,7 +113,7 @@ namespace VueBugTrackerProject.Server.Controllers
 
                     await _signInManager.SignInAsync(account, false);
 
-                    //TODO: return more detailed user information
+                    //TODO: possibly return more detailed user information
                     //Returns account ID if username and password match
                     return Ok(new { account.Id, username = account.UserName, role = account.Role, account.Icon });
                 }

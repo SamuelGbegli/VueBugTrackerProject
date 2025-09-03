@@ -138,8 +138,6 @@ onBeforeMount(async () =>{
 async function getProjects() {
   try{
 
-    console.log(JSON.stringify(filterDTO.value));
-
     //Gets projects from server
     const response = await axios.post(`/projects/search`, filterDTO.value);
 
@@ -155,7 +153,6 @@ async function getProjects() {
     //Otherwise sets 200 from the server
     else statusCode.value = response.status;
 
-    console.log(statusCode.value);
   }
   catch(ex){
     //Sets status code error

@@ -133,8 +133,6 @@ async function getRecentUserProjects(){
     for(let i = 0; i < response.data.length; i++){
       projects.push(Object.assign(new ProjectPreviewViewModel, response.data[i]));
     }
-
-    console.log(projects);
     recentUserProjects.value = response.data;
     userProjectsStatusCode.value = response.status;
   }

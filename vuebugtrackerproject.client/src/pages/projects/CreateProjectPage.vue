@@ -26,7 +26,6 @@ const authStore = useAuthStore();
 const isLoggedIn = ref(null);
 
   onMounted(async() =>{
-    console.log(isLoggedIn.value)
     isLoggedIn.value = await authStore.isLoggedInBackend();
   })
 

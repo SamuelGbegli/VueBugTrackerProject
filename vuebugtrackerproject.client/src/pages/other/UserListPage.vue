@@ -139,7 +139,6 @@ import ErrorPromptType from '@/enumConsts/ErrorPromptType';
     loading.value = true;
     try {
       const response = await axios.get(`/accounts/get?pageNumber=${currentPage.value}`);
-      console.log(response);
       accountContainer.value = Object.assign(new AccountContainer(), response.data);
     } catch {
 

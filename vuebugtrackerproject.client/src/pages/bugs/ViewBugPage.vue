@@ -4,7 +4,7 @@
       <QCard style="min-height: 60vh">
         <QCardSection v-if="statusCode === 200">
           <h5>Description</h5>
-          <span>{{ bug.description }}</span>
+          <div v-html="bug.description"/>
         </QCardSection>
         <QCardSection v-else>
           <QSkeleton square height="500px"/>
@@ -37,7 +37,7 @@
             {{ bugSeverity[bug.severity] }}
           </QChip>
         </QCardSection>
-        <QCardSection>
+        <QCardSection v-if="editStatusCode === 200">
           <QBtn @click="showBugToggleDialog" :label="bug.isOpen ? 'Close bug' : 'Reopen bug'"/>
         </QCardSection>
         </div>
@@ -66,6 +66,7 @@ const bugSeverity = ["Low", "Medium", "High"];
 
     const bug = ref(new BugViewModel());
     const statusCode = ref();
+    const editStatusCode = ref();
     const route = useRoute();
     const router = useRouter();
 
@@ -75,6 +76,7 @@ const bugSeverity = ["Low", "Medium", "High"];
         const response = await axios.get(`/bugs/get/${route.params.bugId}`);
         statusCode.value = response.status;
         bug.value = response.data;
+        await checkIfUserCanEdit()
       }
       catch (ex){
         const error = ex as AxiosError;
@@ -82,6 +84,7 @@ const bugSeverity = ["Low", "Medium", "High"];
       }
     });
 
+//Shows dialog to open or close a bug
   function showBugToggleDialog(){
     Dialog.create({
       component: ConfirmationDialog,
@@ -116,4 +119,16 @@ const bugSeverity = ["Low", "Medium", "High"];
       }
       Loading.hide();
     }
+
+//Function to verify if the user can edit the project's bug
+async function checkIfUserCanEdit(){
+  try{
+    const response = await axios.get(`/projects/canedit/${bug.value.projectID}`);
+    editStatusCode.value = response.status;
+  }
+  catch (ex) {
+    const error = ex as AxiosError;
+    editStatusCode.value = error.status;
+  }
+}
   </script>

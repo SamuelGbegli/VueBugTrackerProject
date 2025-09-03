@@ -64,7 +64,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 await _dbContext.Projects.AddAsync(project);
                 await _dbContext.SaveChangesAsync();
 
-                return Created($"project/{project.ID}",projectDTO);
+                return Created($"project/{project.ID}", projectDTO);
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace VueBugTrackerProject.Server.Controllers
 
                 //If user is not logged in, only return projects that can be seen by all
                 if (!User.Identity.IsAuthenticated)
-                    projects = projects.Where(p => p.Visibility == Visibility.Public).ToList() ;
+                    projects = projects.Where(p => p.Visibility == Visibility.Public).ToList();
                 else
                 {
                     //If user is logged in, return projects that are public, available to logged in users only
@@ -103,7 +103,7 @@ namespace VueBugTrackerProject.Server.Controllers
                     projects = projects.Where(p => p.Visibility != Visibility.Restricted || p.UserPermissions.Any(up => up.Account == account)).ToList();
                 }
 
-                var projectContainer = new ProjectContainer { TotalProjects = projects.Count};
+                var projectContainer = new ProjectContainer { TotalProjects = projects.Count };
 
                 //Creates view models based on projects found
                 foreach (var project in projects.OrderByDescending(p => p.DateModified).Skip(30 * (pageNumber - 1)).Take(30))
@@ -112,7 +112,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 }
 
                 //Returns the projects
-                    return Ok(projectContainer);
+                return Ok(projectContainer);
             }
             catch (Exception ex)
             {
@@ -164,7 +164,7 @@ namespace VueBugTrackerProject.Server.Controllers
                     queries.Any(q => p.Name.ToLower().Contains(q)
                         || p.Summary.ToLower().Contains(q)
                         || p.Tags.Any(t => t.ToLower() == q))).ToList();
-                    
+
                 }
                 //2. Checks if projects have any open bugs or none
                 switch (filterDTO.ProjectType)
@@ -188,8 +188,8 @@ namespace VueBugTrackerProject.Server.Controllers
                     //project was created or modified
 
                     //Filters projects from a certain date if DateEnd value is null
-                    if(filterDTO.DateEnd == null)
-                        projects = projects.Where(p => 
+                    if (filterDTO.DateEnd == null)
+                        projects = projects.Where(p =>
                             filterDTO.DateSearch == DateSearch.CreatedDate ?
                             p.DateCreated >= filterDTO.DateFrom :
                             p.DateModified >= filterDTO.DateFrom).ToList();
@@ -200,7 +200,7 @@ namespace VueBugTrackerProject.Server.Controllers
                             filterDTO.DateSearch == DateSearch.CreatedDate ?
                             p.DateCreated <= filterDTO.DateEnd :
                             p.DateModified <= filterDTO.DateEnd).ToList();
-                    
+
                     //Filters projects on range between the earliest and latest dates
                     else
                     {
@@ -218,7 +218,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 switch (filterDTO.SortType)
                 {
                     case SortType.Name:
-                        if(filterDTO.SortOrder == SortOrder.Ascending)
+                        if (filterDTO.SortOrder == SortOrder.Ascending)
                             projects = projects.OrderBy(p => p.Name).ToList();
                         else projects = projects.OrderByDescending(p => p.Name).ToList();
                         break;
@@ -282,7 +282,8 @@ namespace VueBugTrackerProject.Server.Controllers
                 return Ok(projects.Count);
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(500, ex.Message);
             }
         }
@@ -311,7 +312,7 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (getUserProjects)
                 {
                     //Bounces the user if they are not logged in
-                    if(!User.Identity.IsAuthenticated) return Unauthorized();
+                    if (!User.Identity.IsAuthenticated) return Unauthorized();
 
                     //Gets thw user's account
                     var account = await _userManager.GetUserAsync(User);
@@ -333,11 +334,11 @@ namespace VueBugTrackerProject.Server.Controllers
                     }
                 }
 
-                    //Creates view models based on the first 5 projects found
-                    foreach (var project in projects.Take(5))
-                    {
-                        projectPreviews.Add(new ProjectPreviewViewModel(project));
-                    }
+                //Creates view models based on the first 5 projects found
+                foreach (var project in projects.Take(5))
+                {
+                    projectPreviews.Add(new ProjectPreviewViewModel(project));
+                }
                 //Returns the projects
                 return Ok(projectPreviews);
             }
@@ -491,6 +492,91 @@ namespace VueBugTrackerProject.Server.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Checks if the user has editing priviliges for a project.
+        /// </summary>
+        /// <param name="projectId">The project's ID.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("canedit/{projectId}")]
+        [Authorize]
+        public async Task<IActionResult> CanUserEditProject(string projectId)
+        {
+            try
+            {
+                //Checks if user is logged in
+                if (!User.Identity.IsAuthenticated) return Unauthorized();
+                var account = await _userManager.GetUserAsync(User);
+
+                //Looks for project
+                var project = await _dbContext.Projects
+                    .FirstOrDefaultAsync(p => p.ID == projectId);
+                if (project == null) return NotFound();
+
+                //Gets user permissions
+                var userPermissions = await _dbContext.UserPermissions
+                    .Include(up => up.Account).ToListAsync();
+
+                //Denies request if user did not create project or does not have permission to edit the project
+                if (project.Owner != account)
+                {
+                    var permission = userPermissions.FirstOrDefault(up => up.Account == account);
+                    if (permission == null || permission.Permission != ProjectPermission.Editor) return Unauthorized();
+                }
+
+                //Sends true back to the client
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                //Something went wrong, send error message
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Checks if the user can view or edit a project.
+        /// </summary>
+        /// <param name="projectId">The project's ID.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("canview/{projectId}")]
+        [Authorize]
+        public async Task<IActionResult> CanUserViewProject(string projectId)
+        {
+            try
+            {
+                //Checks if user is logged in
+                if (!User.Identity.IsAuthenticated) return Unauthorized();
+                var account = await _userManager.GetUserAsync(User);
+
+                //Looks for project
+                var project = await _dbContext.Projects
+                    .FirstOrDefaultAsync(p => p.ID == projectId);
+                if (project == null) return NotFound();
+
+                //Gets user permissions
+                var userPermissions = await _dbContext.UserPermissions
+                    .Include(up => up.Account).ToListAsync();
+
+                //Denies request if user did not create project or does not have permission to view a restricted project
+                if (project.Owner != account)
+                {
+                    var permission = userPermissions.FirstOrDefault(up => up.Account == account);
+                    if (permission == null) return Unauthorized();
+                }
+
+                //Sends true back to the client
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                //Something went wrong, send error message
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         /// <summary>
         /// Function to create dummy projects for testing.  
         /// </summary>
@@ -509,7 +595,7 @@ namespace VueBugTrackerProject.Server.Controllers
                     var project = new Project
                     {
                         Name = $"Test project {i}",
-                          Summary = $"Test project {i}",
+                        Summary = $"Test project {i}",
                         Visibility = Visibility.Public,
                         DateCreated = DateTime.UtcNow,
                         DateModified = DateTime.UtcNow,

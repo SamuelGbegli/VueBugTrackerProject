@@ -47,7 +47,6 @@ onMounted(async ()=>{
     project.value = Object.assign(new ProjectViewModel(), response.data);
     //Updates status code to show the project
     statusCode.value = response.status;
-    console.log(response.status);
 
   }
   catch(ex){
@@ -55,7 +54,6 @@ onMounted(async ()=>{
     const error = ex as AxiosError;
     //Updates status code to show error banner
     statusCode.value = error.status;
-    console.log(error);
     //Chooses error message when a project isn't returned
     switch(error.status){
       //User that isn't logged in accesses project only visible to logged in users

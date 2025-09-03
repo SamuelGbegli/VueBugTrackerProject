@@ -7,7 +7,7 @@
       <br/>
     <BugForm/>
     <QInnerLoading
-    :showing="statusCode === 0"/>
+    :showing="!statusCode"/>
   </div>
   <ErrorBanner v-else
     :prompt-type=" ErrorPromptType.GoBackButtonOnly"
@@ -15,19 +15,19 @@
 </template>
 <script setup lang="ts">
   import BugForm from '@/components/BugForm.vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 
-const statusCode = ref(0);
+const statusCode = ref();
 const route = useRoute();
 const authStore = useAuthStore();
 
 //Used to verify if the user has created the project
-//TODO
+
   onBeforeMount(async () =>{
     try{
       const response = await axios.get(`/projects/get/${route.params.projectId}`);
@@ -38,7 +38,8 @@ const authStore = useAuthStore();
       else statusCode.value = response.status;
     }
     catch(ex){
-
+      const error = ex as AxiosError;
+      statusCode.value = error.status;
     }
   });
 

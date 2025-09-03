@@ -65,8 +65,6 @@ onBeforeMount(async () =>{
     //Assigns project view model objects
     projects.value = Object.assign(new ProjectContainer(), response.data);
 
-    console.log(response)
-
     //Sets the maximum value of the pagination control
     numberOfPages.value = Math.ceil(projects.value.totalProjects / 30);
 

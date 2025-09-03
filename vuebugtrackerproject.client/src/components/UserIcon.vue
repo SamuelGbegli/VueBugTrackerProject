@@ -14,6 +14,4 @@ const props = defineProps({
   icon: String
 })
 
-console.log(props.icon);
-
 </script>

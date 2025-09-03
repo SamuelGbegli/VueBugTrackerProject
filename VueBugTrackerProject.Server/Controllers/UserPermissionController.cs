@@ -27,7 +27,7 @@ namespace VueBugTrackerProject.Server.Controllers
         /// Returns a list of user permission data.
         /// </summary>
         /// <param name="projectID">THe ID of the project that will be selected.\</param>
-        /// <param name="pageNumber">The page of prermissions that will be returned.</param>
+        /// <param name="pageNumber">The page of prermissions that will be returned.validate</param>
         /// <returns></returns>
         [HttpGet]
         [Route("get")]

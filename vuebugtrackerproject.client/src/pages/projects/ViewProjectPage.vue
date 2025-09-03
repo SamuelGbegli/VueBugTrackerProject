@@ -71,13 +71,11 @@ import formatDate from '@/classes/helpers/FormatDate';
   const route = useRoute();
 
   onBeforeMount(async ()=>{
-    //TODO: add error handling for when loading project fails
     try{
       const response = await axios.get(`/projects/get/${route.params.projectId}`);
       statusCode.value = response.status;
       project.value = response.data;
 
-      console.log(project.value.tags);
     }
     catch (ex){
       const error = ex as AxiosError;

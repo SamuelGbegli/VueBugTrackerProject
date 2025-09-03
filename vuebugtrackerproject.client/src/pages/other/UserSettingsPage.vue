@@ -18,17 +18,17 @@
           vertical>
             <QTabPanel name="Avatar">
               <!--Change avatar section-->
-              <div>
-                <p>Use the form below to change your user avatar. Please make sure what you upload complies with site policy.</p>
+              <div class="q-gutter-md">
+                <p>This part of the site is not functional, instead being a demonstration for how updating a user profile could look like.</p>
                 <ul>
                   <li>Images must be a .png, .jpeg or .gif file, and must be 1 MB or less.</li>
                   <li>Anything you upload may be downsized.</li>
                 </ul>
-                <div class="row">
+                <div class="row"><!--
                   <div class="col">
                     <h5>Current avatar</h5>
-                    <!--TODO: Show larger version of current user avatar-->
-                  </div>
+                    Show larger version of current user avatar
+                  </div>-->
                   <div class="col">
                     <QUploader
                         auto-upload
@@ -36,7 +36,6 @@
                         accept="image/jpeg, image/png, image/gif"
                         style="max-width: 300px;" />
 
-                    <!--TODO: update avatar when icon is uploaded-->
                   </div>
                 </div>
               </div>

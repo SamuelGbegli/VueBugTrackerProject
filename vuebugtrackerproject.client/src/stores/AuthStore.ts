@@ -30,7 +30,7 @@ export const useAuthStore = defineStore("auth", {
       catch(ex){
         //Something went wrong, return error message
 
-        let error = ex as AxiosError;
+        const error = ex as AxiosError;
 
         //Message if client cannot connect to server
         if (error.status === 500)
@@ -46,33 +46,6 @@ export const useAuthStore = defineStore("auth", {
       return this.user != null;
     },
 
-    //TODO: possibly remove
-    //Function to verify the user's JWT
-    async isJWTValid(){
-      if (!this.user.token) return false;
-
-      try{
-        //Sends token to backend to validate
-        const response = await axios.post("/auth/validatetoken", JSON.parse(localStorage.getItem("user") || "{}").token,{
-          headers: {"Content-Type": "application/json"}
-        });
-
-        //Only exists to test if the token is valid
-          console.log("Token is valid");
-      }
-      catch (ex){
-
-                //Logs the user out if token is invalid
-                if((ex as AxiosError).status != 500){
-                  console.log("Token is invalid");
-                  this.logout();
-                }
-                else
-        //Server error, means token cannot be validated
-        console.log("Cannot connect to server.", ex);
-      }
-    },
-
     //Checks if the user is logged in with ASP.NET's system
     async isLoggedInBackend(){
       try{
@@ -83,7 +56,7 @@ export const useAuthStore = defineStore("auth", {
         }
         return (response.data);
       }
-      catch (ex){
+      catch {
         //If the frontend cannot connect to the server, ensures that the user store is empty
 
         // this.user = null;
@@ -115,7 +88,7 @@ export const useAuthStore = defineStore("auth", {
     //Checks if the user has the correct permissions in a project
     async isUserValidated(projectId: string, role: number) {
       try{
-        const response = await axios.post("userpermissions/validate", {
+        await axios.post("userpermissions/validate", {
           projectId: projectId,
           permission: role,
         })
@@ -123,13 +96,13 @@ export const useAuthStore = defineStore("auth", {
         return true;
       }
       //Cannot connect to server, or user is not authorised
-      catch(ex){
+      catch {
         return false
       }
     },
     //Updates the account's visible name when it is updated
-    updateUsername(newUsername: string){
-      console.log(this.user);
-    }
+    // updateUsername(newUsername: string){
+    //   console.log(this.user);
+    // }
   }
 })

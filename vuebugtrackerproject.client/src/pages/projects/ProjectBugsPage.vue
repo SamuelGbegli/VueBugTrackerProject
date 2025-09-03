@@ -226,7 +226,6 @@ onBeforeMount(async() =>{
   const projectResponse = await axios.get(`/projects/get/${route.params.projectId}`);
   project.value = projectResponse.data;
 
-  console.log(project.value);
 });
 
 //Gets bugs from the server

@@ -57,9 +57,9 @@ const passwordConfirm = ref("");
 
 async function validateToken(){
     try{
-const response = await axios.get(`/auth/validateresettoken?id=${route.query.id}&token=${route.query.token}`);
-console.log(typeof response);
-isTokenValid.value = response.data;
+  const response = await axios.get(`/auth/validateresettoken?id=${route.query.id}&token=${route.query.token}`);
+
+  isTokenValid.value = response.data;
 }
 catch(ex){
 const error = ex as AxiosError;

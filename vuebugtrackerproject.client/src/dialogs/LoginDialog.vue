@@ -75,7 +75,7 @@ import { useAuthStore } from '@/stores/AuthStore';
     });
 
     //Creates DTO to send to the server
-    let userDTO = new UserDTO();
+    const userDTO = new UserDTO();
 
     userDTO.Username = username.value;
     userDTO.Password = password.value;

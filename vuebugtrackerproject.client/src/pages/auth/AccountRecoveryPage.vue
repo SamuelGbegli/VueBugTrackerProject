@@ -74,9 +74,7 @@ async function onSubmit(){
 
   try{
     //Sends a post request to the server
-    const response = await axios.post("/auth/passwordresetrequest", userDTO);
-
-console.log(response);
+    await axios.post("/auth/passwordresetrequest", userDTO);
 
     //Hides the form if the request was successful
     isFormSubmitted.value = true;
@@ -104,8 +102,6 @@ console.log(response);
 
 
   }
-
-  console.log(JSON.stringify(userDTO));
 
   Loading.hide();
 }

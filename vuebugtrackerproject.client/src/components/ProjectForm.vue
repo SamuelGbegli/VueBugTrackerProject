@@ -106,7 +106,6 @@ import ProjectViewModel from '@/viewmodels/ProjectViewModel';
       description.value = props.Project.description;
       tags.value = props.Project.tags.join(",");
 
-    console.log((props.Project));
     }
   });
 
@@ -138,7 +137,6 @@ import ProjectViewModel from '@/viewmodels/ProjectViewModel';
       else{
         const response = await axios.post("/projects/create", projectDTO);
         if(response.status === 201){
-          console.log(response.headers.location);
           router.push({path:response.headers.location});
         }
       }

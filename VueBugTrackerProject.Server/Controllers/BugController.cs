@@ -255,7 +255,6 @@ namespace VueBugTrackerProject.Server.Controllers
                     if (!User.Identity.IsAuthenticated) return Unauthorized("Login reqired");
                 }
 
-                var bugViewModel = new BugViewModel(bug);
                 return Ok(new BugViewModel(bug));
             }
             catch (Exception ex)
@@ -328,7 +327,6 @@ namespace VueBugTrackerProject.Server.Controllers
                 if (project == null) return NotFound();
 
                 //Checks if user owns the project or has editing privilages
-                //TODO: add checking for user permissions
 
                 //Gets account's user permission, if any
                 var userPermission = await _databaseContext.UserPermissions

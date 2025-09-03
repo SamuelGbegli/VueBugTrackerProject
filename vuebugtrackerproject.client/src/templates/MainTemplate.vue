@@ -116,7 +116,8 @@ async function logout(){
   Loading.hide();
 
   //Ensures drawer is closed
-  rightDrawerOpen.value = false
+  rightDrawerOpen.value = false;
+  router.go(0);
 }
 
 //Function to open the login dialog

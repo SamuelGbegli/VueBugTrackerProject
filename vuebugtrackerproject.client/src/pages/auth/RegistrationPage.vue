@@ -151,7 +151,6 @@ userDTO.Username = username.value;
 try{
   //Sends user info to server
   const response = await axios.post("auth/createaccount", userDTO);
-console.log(response);
 
   //Account has been created
   if(response.status === 204){

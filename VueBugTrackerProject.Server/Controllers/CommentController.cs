@@ -238,5 +238,57 @@ namespace VueBugTrackerProject.Server.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+
+        /// <summary>
+        /// Checks if the user can add a comment to a bug
+        /// </summary>
+        /// <param name="projectId">The bug's ID.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("canadd/{bugid}")]
+        [Authorize]
+        public async Task<IActionResult> CanUserAddBug(string bugId)
+        {
+            try
+            {
+                //Checks if user is logged in
+                if (!User.Identity.IsAuthenticated) return Unauthorized();
+                var account = await _userManager.GetUserAsync(User);
+
+                //Lookks for bug
+                var bug = await _dbContext.Bugs
+                    .Include(b => b.Project)
+                    .FirstOrDefaultAsync(b => b.ID == bugId);
+                if(bug == null) return NotFound();
+
+                //Looks for project
+                var project = await _dbContext.Projects
+                    .FirstOrDefaultAsync(p => p.ID == bug.Project.ID);
+                if (project == null) return NotFound();
+
+                //Gets user permissions
+                var userPermissions = await _dbContext.UserPermissions
+                    .Include(up => up.Account)
+                    .Where(up => up.Project == project)
+                    .ToListAsync();
+
+                //Denies request if user did not create project or does not have permission to view a restricted project
+                if (project.Owner != account)
+                {
+                    var permission = userPermissions.FirstOrDefault(up => up.Account == account);
+                    if (permission == null || ((int)permission.Permission == -1) ) return Unauthorized();
+                }
+
+                //Sends true back to the client
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                //Something went wrong, send error message
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }

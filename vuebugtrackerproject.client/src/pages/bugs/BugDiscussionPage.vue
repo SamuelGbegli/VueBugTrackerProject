@@ -4,13 +4,13 @@
   <div class="row">
     <h6>Total comments: {{ commentContainer.totalComments }}</h6>
     <QSpace/>
-    <QBtn @click="showCommentDialog()" label="Add comment"/>
+    <QBtn @click="showCommentDialog()" v-if="addCommentStatusCode === 200" label="Add comment"/>
   </div>
   <br/>
   <div v-if="!commentStatusCode || commentStatusCode == 200">
     <div v-for="x in commentContainer.comments" v-bind:key="(x as CommentViewModel).id">
       <CommentPreview :comment="(x as CommentViewModel)" />
-      <div class="row" v-if="!x.isStatusUpdate">
+      <div class="row" v-if="!x.isStatusUpdate && addCommentStatusCode === 200">
         <QSpace/>
         <QBtn v-if="authStore.getUserID()" @click="showCommentDialog(null, x)" label="Reply" />
         <QBtn v-if="x.ownerID === authStore.getUserID()" @click="showCommentDialog(x)" label="Edit" />
@@ -62,11 +62,15 @@
   //Stores the status code when fetching comments
   const commentStatusCode = ref();
 
+  //Stores status code for whether the user add a comment
+  const addCommentStatusCode = ref();
+
   const route = useRoute();
   const authStore = useAuthStore();
 
   onBeforeMount(async () => {
     await getComments();
+    await canUserAddComments()
     if (!!commentContainer.value) {
       numberOfPages.value = Math.ceil(commentContainer.value.totalComments / 20);
     }
@@ -86,7 +90,6 @@
 
       commentStatusCode.value = response.status
     } catch(ex) {
-      //TODO: add error handling for when comment fetching fails
       //Frontend failed to fetch comments, shows error message
       const error = ex as AxiosError
       commentStatusCode.value = error.status
@@ -161,4 +164,16 @@
       }
     });
   }
+
+  //Function to verify if the user can edit the project's bug
+async function canUserAddComments(){
+  try{
+    const response = await axios.get(`/comments/canadd/${route.params.bugId}`);
+    addCommentStatusCode.value = response.status;
+  }
+  catch (ex) {
+    const error = ex as AxiosError;
+    addCommentStatusCode.value = error.status;
+  }
+}
 </script>

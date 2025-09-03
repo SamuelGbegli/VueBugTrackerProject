@@ -66,7 +66,6 @@ onBeforeMount(() =>{
     bugSeverity.value = options[props.Bug.severity];
     bugDescription.value = props.Bug.description;
 
-    console.log(props.Bug);
   }
 });
 

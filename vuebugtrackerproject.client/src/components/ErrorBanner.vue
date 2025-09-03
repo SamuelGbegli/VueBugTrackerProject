@@ -21,8 +21,6 @@
 
 import { Dialog } from 'quasar';
 import LoginDialog from '@/dialogs/LoginDialog.vue';
-import { useAuthStore } from '@/stores/AuthStore';
-import { useRouter } from 'vue-router';
 import router from '@/router/router';
 import ErrorPromptType from '@/enumConsts/ErrorPromptType';
 
@@ -30,10 +28,6 @@ const props = defineProps({
   message: String,
   promptType: Number
 });
-
-const route = useRouter();
-
-const authStore = useAuthStore();
 
 //Function to open the login dialog
 function showLoginDialog(){
@@ -44,12 +38,9 @@ Dialog.create({
 
   }
 }).onOk(() => {
-  console.log("Called OK");
   router.go(0);
 }).onCancel(() =>{
-  console.log("Called cancel");
 }).onDismiss(() => {
-  console.log("Called either OK or Cancel");
 })
 }
 </script>
